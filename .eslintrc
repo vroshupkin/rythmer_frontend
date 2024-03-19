@@ -1,0 +1,43 @@
+{
+	"root": true,
+	"parser": "@typescript-eslint/parser",
+	"plugins": [
+		"@typescript-eslint"
+	],
+	"extends": [
+		"eslint:recommended",
+		"plugin:@typescript-eslint/eslint-recommended",
+		"plugin:@typescript-eslint/recommended"
+	],
+	"ignorePatterns": [
+		"config-overrides.js",
+		"tailwind.config.js"
+	],
+	"rules": {
+		"@typescript-eslint/ban-types": "off",
+		"@typescript-eslint/no-unused-vars": [
+			"off"
+		],
+		"@typescript-eslint/no-explicit-any": "off",
+		// "@typescript-eslint/explicit-function-return-type": [
+		// 	"warn"
+		// ],
+		"@typescript-eslint/no-this-alias": "off",
+		"curly": "error",
+		"brace-style": ["error", "allman"],
+		"quotes": ["error", "single"],
+		"indent": ["error", 2],
+		"no-multiple-empty-lines": 	["error", {"max": 2}],
+		"semi": ["error", "always"],
+		"newline-before-return": ["error"],
+		"object-curly-spacing": ["error", "always"],
+		"array-bracket-spacing": ["error", "always"],
+		"no-unreachable": "error",
+		"no-empty": ["error", {"allowEmptyCatch": true}],
+		"@typescript-eslint/ban-ts-comment": "off"
+	},
+
+	"env": {
+		"browser": true
+	}
+}
