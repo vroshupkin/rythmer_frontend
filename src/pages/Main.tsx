@@ -1,37 +1,15 @@
+import { configureStore } from '@reduxjs/toolkit';
 import { FC } from 'react';
-import { PayloadAction, configureStore, createSlice } from '@reduxjs/toolkit';
 import { Provider, useDispatch, useSelector } from 'react-redux';
-import { DateTools } from '../shared/DateTools';
-
-type TDateSliceState = {date: Date}
-
-
-const dateSlice = createSlice({
-  name: 'dateSlice',
-  initialState: {
-    date: new Date()
-  },
-  reducers: {
-    addDay: (state: TDateSliceState, action: PayloadAction<number>) => 
-    {
-      state.date = DateTools.addDay(state.date, action.payload);
-    }
-  },
-  selectors: {
-    date: (state) => state.date
-  }
-});
-
-
-const { addDay } = dateSlice.actions;
-
+import { TDateSliceActions, TDateSliceState, dateSlice, dateSliceActions, hooks } from '../entities/Date.slice';
 
 const store = configureStore({
   reducer: dateSlice.reducer ,
   preloadedState: dateSlice.getInitialState()
 });
 
-type TStoreUseDispatch = typeof store.dispatch;
+type TStoreUseDispatch = typeof store.dispatch<TDateSliceActions>;
+
 
 export const Main: FC  = () => 
 {
@@ -46,11 +24,8 @@ export const Main: FC  = () =>
 
 const DateView: FC = () => 
 {
-  
-  // @ts-ignore
-  const date = useSelector((state: {date: Date}) => state.date);
-
-  
+  const date = hooks.selector.useDate;
+ 
   return(
     <div>{`${date.getDate()}.${date.getMonth()}.${date.getFullYear()}`}</div>
   );
@@ -58,17 +33,12 @@ const DateView: FC = () =>
 
 const DateInput: FC = () => 
 {
-  // 
-  // const dispatch = useDispatch.withTypes<TStoreUseDispatch>();
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<TStoreUseDispatch>();
 
   
   const addDayHanlder = (num: number) => 
-  {
-    console.log(addDay(num));
-    
-    // @ts-ignore
-    dispatch(addDay(num));
+  { 
+    dispatch(dateSliceActions.addDay(num));
   };
 
   
