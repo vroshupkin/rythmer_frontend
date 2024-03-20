@@ -16,3 +16,27 @@ export class DateTools
   static addDay = this.changeDate(DateConstant.day);
   
 }
+
+export class MonthName
+{
+  static months = [
+    [ 'январь',   'января' ],
+    [ 'февраль',  'февраля' ],
+    [ 'март',     'марта' ],
+    [ 'апрель',   'апреля' ],
+    [ 'май',      'мая' ],
+    [ 'июнь',     'июня' ],
+    [ 'июль',     'июля' ],
+    [ 'август',   'августа' ],
+    [ 'сентябрь', 'сентября' ],
+    [ 'октябрь',  'октября' ],
+    [ 'ноябрь',   'ноября' ],
+    [ 'декабрь',  'декабря' ],
+    
+  ];
+  
+  static nominative = (ind: number) => this.months[ind][0];
+  static genetive   = (ind: number) => this.months[ind][1];
+
+
+}
