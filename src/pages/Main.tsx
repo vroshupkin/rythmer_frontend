@@ -24,7 +24,7 @@ export const Main: FC  = () =>
 
 const DateView: FC = () => 
 {
-  const date = hooks.selector.useDate;
+  const date = hooks.selector.useDate();
  
   return(
     <div>{`${date.getDate()}.${date.getMonth()}.${date.getFullYear()}`}</div>

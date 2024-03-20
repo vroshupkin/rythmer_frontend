@@ -42,6 +42,6 @@ export const  dateSliceActions = dateSlice.actions;
 
 export const hooks = {
   selector: {
-    useDate: useSelector<TDateSliceState, Date>((state) => new Date(state.date))
+    useDate: () => useSelector<TDateSliceState, Date>((state) => new Date(state.date))
   }
 };
