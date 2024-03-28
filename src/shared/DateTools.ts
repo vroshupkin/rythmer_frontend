@@ -40,3 +40,36 @@ export class MonthName
 
 
 }
+
+export class CountDaysOfMonth
+{
+  private static days = [
+    31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31
+  ];
+
+  static getDays = (order: number, year: number) => 
+  {
+    if(order === 1 && isLeapYear(year))
+    {
+      return 29;
+    }
+
+    return this.days[order];
+  };
+
+}
+
+function isLeapYear(year: number) 
+{
+  if (year % 4 == 0) 
+  {
+    if (year % 100 == 0) 
+    {
+      return year % 400 == 0;
+    }
+    
+    return true;
+  }
+  
+  return false;
+}

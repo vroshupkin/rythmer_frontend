@@ -3,6 +3,7 @@ import { useDispatch } from 'react-redux';
 import { dateSliceActions, hooks } from '../entities/Date.slice';
 import { MonthName } from '../shared/DateTools';
 import { TDateStoreUseDispatch } from '../entities/Date.store';
+import { Month } from './Month';
 
 
 export const Calendar: FC = () => 
@@ -25,7 +26,17 @@ export const Calendar: FC = () =>
       <YearInput className='mt-[28px]' date={new Date()}/>
       <MonthSelector onClick={change_month} className='mt-[21px]'/>
       <DateView className={'mt-[25px]'} date={date}/>
-      <DateInput/>
+      {/* <DateInput/> */}
+
+      <div className='flex justify-center'>
+        <div className='flex w-[1090px]'>
+          <Month className={'mt-[21px]'} FirstDayOfMonth={new Date('02.01.2024')}/>
+          <Month className={'mt-[21px]'} FirstDayOfMonth={new Date('03.01.2024')}/>
+          <Month className={'mt-[21px]'} FirstDayOfMonth={new Date('04.01.2024')}/>
+        </div>
+      </div>
+      
+        
     </div>
       
   );
