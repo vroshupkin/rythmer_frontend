@@ -1,5 +1,8 @@
 import { FC } from 'react';
-import { CountDaysOfMonth, MonthName } from '../shared/DateTools';
+import { CountDaysOfMonth, MonthName, setDate } from '../shared/DateTools';
+import { changeDate, hooks } from '../entities/Date.slice';
+import { useDispatch } from 'react-redux';
+import { TDateStoreUseDispatch } from '../entities/Date.store';
 
 
 type TMonthProps = {className?: string, FirstDayOfMonth: Date}
@@ -51,12 +54,18 @@ const Days: FC<{FirstDayOfMonth: Date}> = ({ FirstDayOfMonth }) =>
   
   const offset_empty_days = Array(offset).fill('');
   const days = [ ... Array(count).keys() ].map( v => v + 1);
-  const after_empty_days = [ ... Array(35 - count - offset).fill('') ];
+  
+  const after_empty_days = [ ... Array(42 - count - offset).fill('') ];
+  
   
   return(
-    <div className='flex flex-wrap h-[250px] w-[350px]'>
+    <div className='flex flex-wrap h-[300px] w-[350px]'>
       {offset_empty_days.map(EmptyDayCell)}
-      {days.map(day => <DayCell name={day + ''}/>)} 
+      {days.map(day => 
+        <DayCellWithStore 
+          day={day}
+          FirstDayOfMonth={FirstDayOfMonth}
+        />)} 
       {after_empty_days.map(EmptyDayCell)}
     </div>
     
@@ -64,10 +73,44 @@ const Days: FC<{FirstDayOfMonth: Date}> = ({ FirstDayOfMonth }) =>
 };
 
 
-const DayCell: FC<{name: string}> = ({ name }) => 
-  <div className={'bg-main hover:bg-main_hover cursor-pointer w-[50px] h-[50px] flex justify-center items-center'}>
-    <span>{name}</span>
-  </div>;
+const DayCellWithStore: FC<{day: number, FirstDayOfMonth: Date}> = ({ day, FirstDayOfMonth }) => 
+{
+
+
+  const date = hooks.selector.useDate();
+
+  const isSelectedDay = () => 
+    date.getMonth() === FirstDayOfMonth.getMonth() && 
+    date.getFullYear() === FirstDayOfMonth.getFullYear() && 
+    date.getDate() === day;
+  
+  const dispatch = useDispatch<TDateStoreUseDispatch>();
+
+  const onClick = () => 
+  {
+    const date = new setDate(FirstDayOfMonth).setDay(day).date;
+    
+    dispatch(changeDate(date + ''));
+  };
+
+  const Styles = {
+    common: 'cursor-pointer w-[50px] h-[50px] flex justify-center items-center ',
+    active: 'bg-select hover:bg-select_hover',
+    unactive: 'bg-main hover:bg-main_hover',
+    
+  };
+
+
+  return(
+    <div 
+      onClick={onClick}
+      className={`${Styles.common} ${isSelectedDay() ? Styles.active : Styles.unactive}`}
+    >
+      <span>{day}</span>
+    </div>
+  );
+};
+  
 
 const EmptyDayCell: FC = () => 
   <div className={'bg-main w-[50px] h-[50px] flex justify-center items-center'}>

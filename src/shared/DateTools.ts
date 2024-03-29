@@ -73,3 +73,46 @@ function isLeapYear(year: number)
   
   return false;
 }
+
+export class setDate
+{
+  #date: Date;
+  constructor(date: Date)
+  {
+    this.#date = new Date(date);
+  }
+
+  get date()
+  {
+    return this.#date;
+  }
+  
+  setDay(num: number)
+  {
+    this.#date.setDate(num);
+    
+    return this;
+  }
+  setFirstDay()
+  {
+    this.#date.setDate(1);
+    
+    return this;
+  }
+  
+  nextMonth()
+  {
+    const curr_month = this.#date.getMonth();
+    if(curr_month === 11)
+    {
+      this.#date.setMonth(0);
+      this.#date.setFullYear(this.#date.getFullYear() + 1);
+    }
+    else
+    {
+      this.#date.setMonth(curr_month + 1);
+    }
+
+    return this;
+  }
+}

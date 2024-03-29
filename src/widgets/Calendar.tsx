@@ -1,66 +1,56 @@
 import { FC, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { dateSliceActions, hooks } from '../entities/Date.slice';
-import { MonthName } from '../shared/DateTools';
+import { changeSelectedMonth, hooks } from '../entities/Date.slice';
 import { TDateStoreUseDispatch } from '../entities/Date.store';
+import { MonthName, setDate } from '../shared/DateTools';
 import { Month } from './Month';
 
 
 export const Calendar: FC = () => 
 {
+  const selectedMonth = hooks.selector.useSelectedMonth();
   const date = hooks.selector.useDate();
+
   const dispatch = useDispatch<TDateStoreUseDispatch>();
 
   const change_month = (month_order: number) => 
   {
-    const new_date = new Date(date);
+    const new_date = new Date(selectedMonth);
 
     new_date.setMonth(month_order - 1);  
-    new_date.setFullYear(date.getFullYear());  
+    new_date.setFullYear(selectedMonth.getFullYear());  
     
-    dispatch({ type: 'dateSlice/changeDate', payload: new_date + '' });
+    
+    dispatch(changeSelectedMonth(new_date + ''));
   };
+
 
   return(  
     <div className='flex flex-col w-[100%]'>
       <YearInput className='mt-[28px]' date={new Date()}/>
       <MonthSelector onClick={change_month} className='mt-[21px]'/>
       <DateView className={'mt-[25px]'} date={date}/>
-      {/* <DateInput/> */}
 
       <div className='flex justify-center'>
         <div className='flex w-[1090px]'>
-          <Month className={'mt-[21px]'} FirstDayOfMonth={new Date('02.01.2024')}/>
-          <Month className={'mt-[21px]'} FirstDayOfMonth={new Date('03.01.2024')}/>
-          <Month className={'mt-[21px]'} FirstDayOfMonth={new Date('04.01.2024')}/>
+          <Month
+            className={'mt-[21px]'} 
+            FirstDayOfMonth={new setDate(selectedMonth).setFirstDay().date}
+          />
+          <Month 
+            className={'mt-[21px]'}
+            FirstDayOfMonth={new setDate(selectedMonth).setFirstDay().nextMonth().date}
+          />
+          <Month 
+            className={'mt-[21px]'}
+            FirstDayOfMonth={new setDate(selectedMonth).setFirstDay().nextMonth().nextMonth().date}
+          />
         </div>
       </div>
       
         
     </div>
       
-  );
-};
-
-
-const DateInput: FC = () => 
-{
-  const dispatch = useDispatch<TDateStoreUseDispatch>();
-
-  
-  const addDayHanlder = (num: number) => 
-  { 
-    dispatch(dateSliceActions.addDay(num));
-  };
-
-  
-  const class_name = 'border-[2px] border-[black] rounded-md hover:bg-[gray]';
-  
-  return(
-    <section>
-      <button className={class_name} onClick={_ => addDayHanlder(1)}>Add day</button>
-      <button className={class_name} onClick={_ => addDayHanlder(-1)}>Minus Day</button>
-    </section>
   );
 };
 

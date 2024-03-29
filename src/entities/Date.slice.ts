@@ -1,22 +1,18 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 import { useSelector } from 'react-redux';
-import { DateTools } from '../shared/DateTools';
 
-export type TDateSliceState = { date: string }
+export type TDateSliceState = { selectedMonth: string,  date: string }
 export enum DATE_SLICE {NAME = 'dateSlice'}
 
 const actions_handlers = {
-  addDay: (state: TDateSliceState, action: PayloadAction<number>) =>
+  changeSelectedMonth: (state: TDateSliceState, action: PayloadAction<string>) => 
   {
-    const date = new Date(state.date);
-    state.date = DateTools.addDay(date, action.payload) + '';
+    state.selectedMonth = new Date(action.payload) + ''; 
   },
 
-  changeDate: (state: TDateSliceState, action: PayloadAction<Date>) => 
+  changeDate: (state: TDateSliceState, action: PayloadAction<string>) => 
   {
-    console.log('change');
     state.date = new Date(action.payload) + '';
-    
   }
 };
 
@@ -24,27 +20,23 @@ const actions_handlers = {
 export const dateSlice = createSlice({
   name: DATE_SLICE.NAME,
   initialState: {
-    date: new Date() + ''
+    // Прочесть из кеша
+    selectedMonth: new Date() + '',
+    date: new Date + ''
   },
   reducers: {
     ...actions_handlers
   },
   selectors: {
-    date: (state) => state.date
+    selectedMonth: (state) => state.selectedMonth
   }
 });
 
-
-export type TDateSliceActions = 
-    {type: `${DATE_SLICE.NAME}/addDay`, payload: number} | 
-      {type: `${DATE_SLICE.NAME}/changeDate`, payload: string} 
-
-
-export const  dateSliceActions = dateSlice.actions;
-
 export const hooks = {
   selector: {
+    useSelectedMonth: () => useSelector<TDateSliceState, Date>((state) => new Date(state.selectedMonth)),
     useDate: () => useSelector<TDateSliceState, Date>((state) => new Date(state.date))
   }
 };
 
+export const { changeDate, changeSelectedMonth } = dateSlice.actions;
