@@ -115,4 +115,28 @@ export class setDate
 
     return this;
   }
+
+  
+  changeMonth(count: number)
+  {
+    let year = this.#date.getFullYear() + Math.round(count / 12);
+    let curr_month = this.#date.getMonth() + (count % 12);
+
+    if(curr_month > 12)
+    {
+      year += 1;
+      curr_month %= 12;
+    }
+    else if(curr_month < 0)
+    {
+      year -= 1;
+      curr_month = 12 + (curr_month % 12);
+      curr_month = curr_month === 12? 0 : curr_month;
+    }
+
+    this.#date.setFullYear(year);
+    this.#date.setMonth(curr_month);
+
+    return this;
+  }  
 }

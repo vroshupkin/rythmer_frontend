@@ -75,8 +75,6 @@ const Days: FC<{FirstDayOfMonth: Date}> = ({ FirstDayOfMonth }) =>
 
 const DayCellWithStore: FC<{day: number, FirstDayOfMonth: Date}> = ({ day, FirstDayOfMonth }) => 
 {
-
-
   const date = hooks.selector.useDate();
 
   const isSelectedDay = () => 
@@ -95,18 +93,20 @@ const DayCellWithStore: FC<{day: number, FirstDayOfMonth: Date}> = ({ day, First
 
   const Styles = {
     common: 'cursor-pointer w-[50px] h-[50px] flex justify-center items-center ',
-    active: 'bg-select hover:bg-select_hover',
+    active: 'bg-select hover:bg-select_hover w-[100%] h-[100%] flex justify-center items-center rounded-[50px]' + 
+    ' border-[1px]',
     unactive: 'bg-main hover:bg-main_hover',
     
   };
 
-
   return(
     <div 
       onClick={onClick}
-      className={`${Styles.common} ${isSelectedDay() ? Styles.active : Styles.unactive}`}
-    >
-      <span>{day}</span>
+      className={`${Styles.common} ${Styles.unactive}`}
+    > 
+      <div className={`${isSelectedDay()? Styles.active : ''}`}>
+        <span>{day}</span>
+      </div>
     </div>
   );
 };

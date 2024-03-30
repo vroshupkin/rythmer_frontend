@@ -29,24 +29,22 @@ export const Calendar: FC = () =>
     <div className='flex flex-col w-[100%]'>
       <YearInput className='mt-[28px]' date={new Date()}/>
       <MonthSelector onClick={change_month} className='mt-[21px]'/>
-      <DateView className={'mt-[25px]'} date={date}/>
-
+      
       <div className='flex justify-center'>
-        <div className='flex w-[1090px]'>
+        <div className='flex w-[1090px] mt-[21px]'>
           <Month
-            className={'mt-[21px]'} 
+            FirstDayOfMonth={new setDate(selectedMonth).setFirstDay().changeMonth(-1).date}
+          />
+          <Month 
             FirstDayOfMonth={new setDate(selectedMonth).setFirstDay().date}
           />
           <Month 
-            className={'mt-[21px]'}
-            FirstDayOfMonth={new setDate(selectedMonth).setFirstDay().nextMonth().date}
-          />
-          <Month 
-            className={'mt-[21px]'}
-            FirstDayOfMonth={new setDate(selectedMonth).setFirstDay().nextMonth().nextMonth().date}
+            FirstDayOfMonth={new setDate(selectedMonth).setFirstDay().changeMonth(1).date}
           />
         </div>
       </div>
+      
+      <DateView className={'mt-[25px]'} date={date}/>
       
         
     </div>
