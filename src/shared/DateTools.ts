@@ -139,4 +139,14 @@ export class setDate
 
     return this;
   }  
+
+  setMidnight()
+  {
+    this.#date.setHours(0);
+    this.#date.setMinutes(0);
+    this.#date.setSeconds(0);
+    this.date.setMilliseconds(0);
+
+    return this;
+  }
 }

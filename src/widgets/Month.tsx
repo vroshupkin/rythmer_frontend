@@ -86,7 +86,7 @@ const DayCellWithStore: FC<{day: number, FirstDayOfMonth: Date}> = ({ day, First
 
   const onClick = () => 
   {
-    const date = new setDate(FirstDayOfMonth).setDay(day).date;
+    const date = new setDate(FirstDayOfMonth).setDay(day).setMidnight().date;
     
     dispatch(changeDate(date + ''));
   };

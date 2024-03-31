@@ -1,5 +1,6 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 import { useSelector } from 'react-redux';
+import { setDate } from '../shared/DateTools';
 
 export type TDateSliceState = { selectedMonth: string,  date: string }
 export enum DATE_SLICE {NAME = 'dateSlice'}
@@ -21,8 +22,8 @@ export const dateSlice = createSlice({
   name: DATE_SLICE.NAME,
   initialState: {
     // Прочесть из кеша
-    selectedMonth: new Date() + '',
-    date: new Date + ''
+    selectedMonth: new setDate(new Date()).setMidnight().date + '',
+    date: new setDate(new Date()).setMidnight().date + ''
   },
   reducers: {
     ...actions_handlers
