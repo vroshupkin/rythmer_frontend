@@ -1,121 +1,69 @@
 
+export const open_db = (db_name: string, db_version: number) => 
+{
+  return new Promise<IDBDatabase>((resolve, reject) => 
+  {
+    
+    const request = window.indexedDB.open(db_name, db_version);
+
+    request.onerror = (event) => 
+    {
+      reject('Database error: ' + (event.target as IDBOpenDBRequest));
+    };
+
+    request.onsuccess = (event) => 
+    {
+      const db = (event.target as IDBOpenDBRequest).result;
+
+      db.onversionchange = () => 
+      {
+        db.close();
+        alert('База данных устарела, пожалуйста, перезагрузите страницу.');
+      };
+
+      resolve(db);
+    };
+
+    request.onupgradeneeded = (event) => 
+    {
+      const db = (event.target as IDBOpenDBRequest).result;
+
+      if(!db.objectStoreNames.contains(db_name))
+      {
+        const sleepRoutine = db.createObjectStore(db_name, { keyPath: 'id', autoIncrement: true });
+        sleepRoutine.createIndex('date', 'date', { unique: true });
+        sleepRoutine.createIndex('wake_up', 'wake_up');
+        sleepRoutine.createIndex('faling_sleep', 'faling_sleep');
+      }
+
+      resolve(db);
+    };
+
+  });
+};
+
 export class Database 
 {
-  private db?: IDBDatabase; 
   private store_name = 'sleepRoutine';
   
-  constructor(private dbName: string, private dbVersion: number) 
+  constructor(private db: IDBDatabase) 
+  {}
+
+  private get objectStore()
   {
-    // const transaction = this.db.transaction([ 'people' ], 'readwrite');
-    // const objectStore = transaction.objectStore('people');
-    
+    return this.db.transaction([ this.store_name ], 'readwrite').objectStore(this.store_name);
   }
 
-  public open(): Promise<void> 
+  addSleepTime(dto: {date: Date, wake_up: string, faling_sleep: string})
   {
-    return new Promise<void>((resolve, reject) => 
+    return new Promise((resolve, reject) => 
     {
-      const request = window.indexedDB.open(this.dbName, this.dbVersion);
-
-      request.onerror = (event) => 
-      {
-        reject('Database error: ' + (event.target as IDBOpenDBRequest));
-      };
-
-      request.onsuccess = (event) => 
-      {
-        const db = (event.target as IDBOpenDBRequest).result;
-        console.log('Database opened successfully');
-
-        db.onversionchange = () => 
-        {
-          db.close();
-          alert('База данных устарела, пожалуйста, перезагрузите страницу.');
-        };
-
-        this.db = db;
-        resolve();
-      };
-
-      request.onupgradeneeded = (event) => 
-      {
-        const db = (event.target as IDBOpenDBRequest).result;
-
-        if(!db.objectStoreNames.contains(this.store_name))
-        {
-          const sleepRoutine = db.createObjectStore(this.store_name, { keyPath: 'id', autoIncrement: true });
-          sleepRoutine.createIndex('date', 'date', { unique: true });
-          sleepRoutine.createIndex('wake_up', 'wake_up');
-          sleepRoutine.createIndex('faling_sleep', 'faling_sleep');
-        }
-
-        resolve();
-        
-        
-      };
-
+      this.objectStore.put(dto);
+      const request = this.objectStore.put(dto);
+      request.onsuccess = resolve;
+      request.onerror = reject;
     });
-  }
-
-  async addUser(name: string, email: string)
-  {
     
-    if(!this.db)
-    {
-      throw Error('db must be opened!');
-    }
-      
-    const transaction = this.db.transaction([ 'people' ], 'readwrite');
-    const objectStore = transaction.objectStore('people');
-    
-    
-    const request = objectStore.add({ name: name, email: email });
-      
-    request.onsuccess = (event) => 
-    {
-      console.log('Added new user!');
-      
-      return;
-    };
-
-    request.onerror = (event) => 
-    {
-      // @ts-ignore
-      throw new Error(event.target.error);
-    };
-  }
-
-
-  private async add<T extends Record<string, string | number | Date>>(store: string, dto: T)
-  {
-    if(!this.db)
-    {
-      throw Error('db must be opened!');
-    }
-
-    
-    const transaction = this.db.transaction([ store ], 'readwrite');
-    const objectStore = transaction.objectStore(store);
-    
-    const request = objectStore.put({ ...dto });
-
-    
-    request.onsuccess = (event) => 
-    {
-      return;
-    };
-
-    request.onerror = (event) => 
-    {
-      // @ts-ignore
-      throw new Error(event.target.error);
-    };
-
-  }
-
-  async addSleepTime(dto: {date: Date, wake_up: string, faling_sleep: string})
-  {
-    this.add('sleepRoutine', dto);
   }
 
   updateSleepTime(date: Date, faling_sleep: string)
@@ -125,27 +73,51 @@ export class Database
       
       this.getSleepWakeupTime(date).then((result) => 
       {
-        if(!this.db)
-        {
-          throw Error('db must be opened!');
-        }
-
-        const transaction = this.db.transaction([ this.store_name ], 'readwrite');
-          
-        let request;
+        
         if(result)
         {
           result.faling_sleep = faling_sleep;
-          request = transaction.objectStore(this.store_name).put(result);
         }
         else
         {
-          request = transaction.objectStore(this.store_name).add({ date, faling_sleep, wake_up: '' });
+          result = { faling_sleep, date, wake_up: '' };
         }
 
+        const request = this.objectStore.put(result);
         request.onsuccess = resolve;
         request.onerror = reject;
 
+      });
+
+
+    });
+  }
+
+  updateWakeUp(date: Date, wake_up: string)
+  {
+    return new Promise((resolve, reject) => 
+    {
+      
+      
+      const get_result = async () => 
+      {
+        const result = await this.getSleepWakeupTime(date);
+        if(result)
+        {
+          result.wake_up = wake_up; 
+          
+          return result;
+        }
+        
+        return { date, wake_up, faling_sleep: '' };
+        
+      };
+      
+      get_result().then(result => 
+      {
+        const request = this.objectStore.put(result);
+        request.onsuccess = resolve;
+        request.onerror = reject;
       });
 
 
@@ -156,23 +128,17 @@ export class Database
   {
     return new Promise((resolve, reject) => 
     {
-
-      if(!this.db)
-      {
-        throw Error('db must be opened!');
-      }
-
       const transaction = this.db.transaction([ this.store_name ], 'readonly');
       const objectStore = transaction.objectStore(this.store_name);
     
       const request = objectStore.index('date').get(date);
     
-      request.onsuccess = (e) => 
+      request.onsuccess = () => 
       { 
         resolve(request.result);
       };
 
-      request.onerror = (e) => reject;
+      request.onerror = reject;
 
     }
     );

@@ -1,16 +1,18 @@
 import { FC, useState } from 'react';
 import { Provider } from 'react-redux';
-import { Database } from '../entities/Database';
+import { Database, open_db } from '../entities/Database';
 import { hooks } from '../entities/Date.slice';
 import { date_store } from '../entities/Date.store';
 import { Calendar } from '../widgets/Calendar';
 import { LeftMenu } from '../widgets/LeftMenu';
 
 
-const db = new Database('App', 2);
-await db.open();
+const db = await open_db('App', 2);
+const crud = new Database(db);
+
+// await crud.open();
 // await db.addUser('hello', 'user@gmail.com');
-await db.addSleepTime({ date: new Date('04.31.24'), wake_up: '10:10', faling_sleep: '2:40' });
+// await crud.addSleepTime({ date: new Date('04.31.24'), wake_up: '10:10', faling_sleep: '2:40' });
 
 
 export const Main: FC  = () => 
@@ -43,19 +45,8 @@ const SleepAndWakeUp: FC = () =>
   const date = hooks.selector.useDate();
   const save = async () => 
   {
-    const search_row = await db.getSleepWakeupTime(date);
-    console.log(search_row);
-    
-    if(!search_row)
-    {
-      db.addSleepTime({ date: new Date(date), faling_sleep: falingSleep, wake_up: wakeUp });
-    }
-    else
-    {
-      await db.updateSleepTime(date, falingSleep);
-      
-    }
-    
+    await crud.updateSleepTime(date, falingSleep);
+    await crud.updateWakeUp(date, wakeUp); 
   };
   
   const Styles = {
