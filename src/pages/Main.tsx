@@ -6,6 +6,7 @@ import { Calendar } from '../widgets/Calendar';
 import { LeftMenu } from '../widgets/LeftMenu';
 import { WakeUpOrSleep } from '../widgets/WakeUpAndSleepTime';
 import { crud } from '../entities/Database';
+import { NoteSelector } from '../widgets/NoteSelector';
 
 
 export const Main: FC  = () => 
@@ -23,6 +24,7 @@ export const Main: FC  = () =>
             <WakeUpOrSleep className='' updateVal={crud.updateSleepTime} getType='faling_sleep'/>
           </div>
           
+          <NoteSelector className='mt-[15px]'/>
           {/* <SleepAndWakeUp/> */}
         </div>
         
