@@ -1,3 +1,6 @@
+
+const defaultTheme = require('tailwindcss/defaultTheme');
+
 /** @type {import('tailwindcss').Config} */
 export default {
   content: [
@@ -11,9 +14,13 @@ export default {
       select: '#AFFFB7',
       select_hover: '#7dff8a',
       edit: '#EAEAEA',
-      
+
     },
-    extend: {},
+    extend: {
+      fontFamily: {
+        Inter: ['"Inter"', ...defaultTheme.fontFamily.sans]
+      }
+    },
   },
   plugins: [],
 }
