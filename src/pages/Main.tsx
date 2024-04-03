@@ -1,18 +1,11 @@
 import { FC, useState } from 'react';
 import { Provider } from 'react-redux';
-import { Database, open_db } from '../entities/Database';
 import { hooks } from '../entities/Date.slice';
 import { date_store } from '../entities/Date.store';
 import { Calendar } from '../widgets/Calendar';
 import { LeftMenu } from '../widgets/LeftMenu';
-
-
-const db = await open_db('App', 2);
-const crud = new Database(db);
-
-// await crud.open();
-// await db.addUser('hello', 'user@gmail.com');
-// await crud.addSleepTime({ date: new Date('04.31.24'), wake_up: '10:10', faling_sleep: '2:40' });
+import { WakeUpOrSleep } from '../widgets/WakeUpAndSleepTime';
+import { crud } from '../entities/Database';
 
 
 export const Main: FC  = () => 
@@ -23,13 +16,17 @@ export const Main: FC  = () =>
       <LeftMenu/>
 
       <Provider store={date_store}>
-        <div className='flex flex-col w-[100%]'>
-
-        
+        <div className='flex flex-col justify-center items-center w-[100%]'>
           <Calendar/>
-          <SleepAndWakeUp/>
+          <div className='w-[320px] mt-[18px] flex flex-space justify-between'>
+            <WakeUpOrSleep className='' updateVal={crud.updateWakeUp} getType='wake_up'/>
+            <WakeUpOrSleep className='' updateVal={crud.updateSleepTime} getType='faling_sleep'/>
+          </div>
+          
+          {/* <SleepAndWakeUp/> */}
         </div>
         
+
       </Provider>
       
     </div>
@@ -42,7 +39,9 @@ const SleepAndWakeUp: FC = () =>
   const [ falingSleep, setFalingSleep ] = useState('');
   const [ wakeUp, setWakeUp ] = useState('');
 
-  const date = hooks.selector.useDate();
+  const date_str = hooks.selector.useDate();
+  const date = new Date(date_str);
+
   const save = async () => 
   {
     await crud.updateSleepTime(date, falingSleep);
@@ -55,10 +54,12 @@ const SleepAndWakeUp: FC = () =>
     span: 'w-[100px] inline-block text-center'
   };
   
+  const getDateMonthYear = (date: Date) => `${date.getDate()}.${date.getMonth()}.${date.getFullYear()}`;
+
   return(
     <div className='flex flex-col'>
       <div>
-        <span className={Styles.span}>{`${date.getDate()}.${date.getMonth()}.${date.getFullYear()}`}</span>
+        <span className={Styles.span}>{getDateMonthYear(date)}</span>
         
       </div>
       

@@ -43,8 +43,8 @@ export const Calendar: FC = () =>
           />
         </div>
       </div>
-      
-      <DateView className={'mt-[25px]'} date={date}/>
+
+      <DateView className={'mt-[25px]'} date={new Date(date)}/>
       
         
     </div>

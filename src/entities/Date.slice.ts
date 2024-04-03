@@ -5,6 +5,7 @@ import { setDate } from '../shared/DateTools';
 export type TDateSliceState = { selectedMonth: string,  date: string }
 export enum DATE_SLICE {NAME = 'dateSlice'}
 
+
 const actions_handlers = {
   changeSelectedMonth: (state: TDateSliceState, action: PayloadAction<string>) => 
   {
@@ -36,7 +37,7 @@ export const dateSlice = createSlice({
 export const hooks = {
   selector: {
     useSelectedMonth: () => useSelector<TDateSliceState, Date>((state) => new Date(state.selectedMonth)),
-    useDate: () => useSelector<TDateSliceState, Date>((state) => new Date(state.date))
+    useDate: () => useSelector<TDateSliceState, string>(state => state.date)
   }
 };
 

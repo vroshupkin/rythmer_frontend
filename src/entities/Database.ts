@@ -54,19 +54,7 @@ export class Database
     return this.db.transaction([ this.store_name ], 'readwrite').objectStore(this.store_name);
   }
 
-  addSleepTime(dto: {date: Date, wake_up: string, faling_sleep: string})
-  {
-    return new Promise((resolve, reject) => 
-    {
-      this.objectStore.put(dto);
-      const request = this.objectStore.put(dto);
-      request.onsuccess = resolve;
-      request.onerror = reject;
-    });
-    
-  }
-
-  updateSleepTime(date: Date, faling_sleep: string)
+  updateSleepTime = (date: Date, faling_sleep: string) =>
   {
     return new Promise((resolve, reject) => 
     {
@@ -91,14 +79,12 @@ export class Database
 
 
     });
-  }
+  };
 
-  updateWakeUp(date: Date, wake_up: string)
+  updateWakeUp = (date: Date, wake_up: string) =>
   {
     return new Promise((resolve, reject) => 
     {
-      
-      
       const get_result = async () => 
       {
         const result = await this.getSleepWakeupTime(date);
@@ -109,8 +95,7 @@ export class Database
           return result;
         }
         
-        return { date, wake_up, faling_sleep: '' };
-        
+        return { date, wake_up, faling_sleep: '' }; 
       };
       
       get_result().then(result => 
@@ -122,7 +107,7 @@ export class Database
 
 
     });
-  }
+  };
 
   getSleepWakeupTime(date: Date): Promise<any>
   {
@@ -146,3 +131,5 @@ export class Database
 }
 
 
+const db = await open_db('App', 2);
+export const crud = new Database(db);

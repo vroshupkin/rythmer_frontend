@@ -75,7 +75,8 @@ const Days: FC<{FirstDayOfMonth: Date}> = ({ FirstDayOfMonth }) =>
 
 const DayCellWithStore: FC<{day: number, FirstDayOfMonth: Date}> = ({ day, FirstDayOfMonth }) => 
 {
-  const date = hooks.selector.useDate();
+  const date_str = hooks.selector.useDate();
+  const date = new Date(date_str);
 
   const isSelectedDay = () => 
     date.getMonth() === FirstDayOfMonth.getMonth() && 
