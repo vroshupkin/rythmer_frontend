@@ -5,13 +5,26 @@ import { date_store } from '../entities/Date.store';
 import { Calendar } from '../widgets/Calendar';
 import { LeftMenu } from '../widgets/LeftMenu';
 import { WakeUpOrSleep } from '../widgets/WakeUpAndSleepTime';
-import { crud } from '../entities/Database';
+import { crud, databaseStores } from '../entities/Database';
 import { NoteSelector } from '../widgets/NoteSelector';
 
 
 export const Main: FC  = () => 
 {
   
+
+  databaseStores.commonNote.put({ date: '05.04.24', message: 'Другая заметка' })
+    .then(() => 
+    {
+      databaseStores.commonNote.get({ date: '05.04.24' }).then(console.log);  
+    });
+
+  // databaseStores.commonNote.get({ date: '05.04.24' }).then(res => 
+  // {
+  //   console.log(res);
+    
+  // });
+    
   return(
     <div className='flex items-start'>
       <LeftMenu/>

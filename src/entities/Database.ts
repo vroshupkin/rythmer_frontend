@@ -1,46 +1,4 @@
 
-export const open_db = (db_name: string, db_version: number) => 
-{
-  return new Promise<IDBDatabase>((resolve, reject) => 
-  {
-    
-    const request = window.indexedDB.open(db_name, db_version);
-
-    request.onerror = (event) => 
-    {
-      reject('Database error: ' + (event.target as IDBOpenDBRequest));
-    };
-
-    request.onsuccess = (event) => 
-    {
-      const db = (event.target as IDBOpenDBRequest).result;
-
-      db.onversionchange = () => 
-      {
-        db.close();
-        alert('База данных устарела, пожалуйста, перезагрузите страницу.');
-      };
-
-      resolve(db);
-    };
-
-    request.onupgradeneeded = (event) => 
-    {
-      const db = (event.target as IDBOpenDBRequest).result;
-
-      if(!db.objectStoreNames.contains(db_name))
-      {
-        const sleepRoutine = db.createObjectStore(db_name, { keyPath: 'id', autoIncrement: true });
-        sleepRoutine.createIndex('date', 'date', { unique: true });
-        sleepRoutine.createIndex('wake_up', 'wake_up');
-        sleepRoutine.createIndex('faling_sleep', 'faling_sleep');
-      }
-
-      resolve(db);
-    };
-
-  });
-};
 
 export class Database 
 {
@@ -130,6 +88,146 @@ export class Database
   }
 }
 
+abstract class AbstractCreateStore
+{
+  abstract createStore: () => void
+}
 
-const db = await open_db('App', 2);
+type TCommonNote = {
+  date: string,
+  message: string
+}
+export class CreateCommonNoteStore 
+{
+  constructor(private db: IDBDatabase)
+  {
+    if(!this.db.objectStoreNames.contains('commonNote'))
+    {
+      const store = this.db.createObjectStore('commonNote', { keyPath: 'id', autoIncrement: true });
+      store.createIndex('date', 'date', { unique: true });
+      store.createIndex('message', 'message');
+    }
+  }
+}
+
+export class CommonNoteCrud
+{
+  private storeName = 'commonNote';
+
+  constructor(private db: IDBDatabase)
+  {
+    
+  }
+
+  private get store()
+  {
+    return this.db.transaction([ this.storeName ], 'readwrite').objectStore(this.storeName);
+  }
+
+  get(input: {date: string})
+  {
+    return new Promise<TCommonNote>((resolve, reject) => 
+    {
+      const req = this.store.index('date').get(input.date);
+      
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = reject;
+    }
+    );
+  }
+
+  put(input: {date: string, message: string})
+  {
+    return new Promise((resolve, reject) =>
+    {
+      const { date, message } = input;
+      
+      const result = this.get({ date }).then(res => 
+      {
+        if(res)
+        {
+          res.message = message;
+        }
+        else
+        {
+          res = input;
+        }
+
+        this.store.put(res);
+
+        resolve(result);
+
+      }).catch(reject);
+      
+    });
+  }
+}
+
+export class SleepRoutineCrud
+{
+  constructor(private db: IDBDatabase)
+  {
+
+  }
+}
+
+export class CreateStoreSleep
+{
+  constructor(db: IDBDatabase)
+  {
+    if(!db.objectStoreNames.contains('sleepRoutine'))
+    {
+      const store = db.createObjectStore('sleepRoutine', { keyPath: 'id', autoIncrement: true });
+      store.createIndex('date', 'date', { unique: true });
+      store.createIndex('wake_up', 'wake_up');
+      store.createIndex('faling_sleep', 'faling_sleep');
+    }
+  }
+}
+
+
+export const open_db = (db_name: string, db_version: number) => 
+{
+  return new Promise<IDBDatabase>((resolve, reject) => 
+  {
+    const request = window.indexedDB.open(db_name, db_version);
+
+    request.onerror = (event) => 
+    {
+      reject('Database error: ' + (event.target as IDBOpenDBRequest));
+    };
+
+    request.onsuccess = (event) => 
+    {
+      const db = (event.target as IDBOpenDBRequest).result;
+
+      db.onversionchange = () => 
+      {
+        db.close();
+        alert('База данных устарела, пожалуйста, перезагрузите страницу.');
+      };
+
+      resolve(db);
+    };
+
+    request.onupgradeneeded = (event) => 
+    {
+      const db = (event.target as IDBOpenDBRequest).result;
+
+      new CreateCommonNoteStore(db);
+      new CreateStoreSleep(db);
+
+      resolve(db);
+    };
+
+  });
+};
+
+
+const db = await open_db('App', 3);
 export const crud = new Database(db);
+export const databaseStores = {
+  commonNote: new CommonNoteCrud(db),
+  sleepRoutine: new SleepRoutineCrud(db)
+};
+
