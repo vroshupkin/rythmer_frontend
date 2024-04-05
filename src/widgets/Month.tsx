@@ -3,6 +3,7 @@ import { CountDaysOfMonth, MonthName, setDate } from '../shared/DateTools';
 import { changeDate, hooks } from '../entities/Date.slice';
 import { useDispatch } from 'react-redux';
 import { TDateStoreUseDispatch } from '../entities/Date.store';
+import React from 'react';
 
 
 type TMonthProps = {className?: string, FirstDayOfMonth: Date}
@@ -37,8 +38,8 @@ const WeekTittle: FC = () =>
   
   return(
     <div className='flex '>
-      {week_arr.map((name) => 
-        <div className='bg-main w-[50px] h-[50px] flex justify-center items-center font-bold'>
+      {week_arr.map((name, key) => 
+        <div key={key} className='bg-main w-[50px] h-[50px] flex justify-center items-center font-bold'>
           <span>{name}</span>
         </div>
       )}
@@ -60,13 +61,27 @@ const Days: FC<{FirstDayOfMonth: Date}> = ({ FirstDayOfMonth }) =>
   
   return(
     <div className='flex flex-wrap h-[300px] w-[350px]'>
-      {offset_empty_days.map(EmptyDayCell)}
-      {days.map(day => 
-        <DayCellWithStore 
-          day={day}
-          FirstDayOfMonth={FirstDayOfMonth}
-        />)} 
-      {after_empty_days.map(EmptyDayCell)}
+      {offset_empty_days.map((_, key) => 
+        <React.Fragment key={key}>
+          <EmptyDayCell/>
+        </React.Fragment>
+      )}
+        
+      {days.map((day, key) => 
+        <React.Fragment key={key}>
+          <DayCellWithStore 
+            day={day}
+            key={key}
+            FirstDayOfMonth={FirstDayOfMonth}
+          />
+        </React.Fragment>
+        
+      )} 
+      {after_empty_days.map((_, key) => 
+        <React.Fragment key={key}>
+          <EmptyDayCell/>
+        </React.Fragment>
+      )}
     </div>
     
   );
