@@ -1,30 +1,23 @@
 import { FC, useState } from 'react';
 import { Provider } from 'react-redux';
+import { databaseStores } from '../entities/Database';
 import { hooks } from '../entities/Date.slice';
 import { date_store } from '../entities/Date.store';
 import { Calendar } from '../widgets/Calendar';
 import { LeftMenu } from '../widgets/LeftMenu';
-import { WakeUpOrSleep } from '../widgets/WakeUpAndSleepTime';
-import { crud, databaseStores } from '../entities/Database';
 import { NoteSelector } from '../widgets/NoteSelector';
+import { WakeUpOrSleep } from '../widgets/WakeUpAndSleepTime';
 
 
 export const Main: FC  = () => 
 {
-  
-
-  databaseStores.commonNote.put({ date: '05.04.24', message: 'Другая заметка' })
+  databaseStores.commonNote.put('09.04.24', { message: 'This is work' })
     .then(() => 
     {
-      databaseStores.commonNote.get({ date: '05.04.24' }).then(console.log);  
+      databaseStores.commonNote.get('09.04.24').then(console.log);  
     });
-
-  // databaseStores.commonNote.get({ date: '05.04.24' }).then(res => 
-  // {
-  //   console.log(res);
-    
-  // });
-    
+  
+   
   return(
     <div className='flex items-start'>
       <LeftMenu/>
@@ -33,8 +26,8 @@ export const Main: FC  = () =>
         <div className='flex flex-col justify-center items-center w-[100%]'>
           <Calendar/>
           <div className='w-[320px] mt-[18px] flex flex-space justify-between'>
-            <WakeUpOrSleep className='' updateVal={crud.updateWakeUp} getType='wake_up'/>
-            <WakeUpOrSleep className='' updateVal={crud.updateSleepTime} getType='faling_sleep'/>
+            <WakeUpOrSleep className='' updateVal={databaseStores.sleepRoutine} getType='wake_up'/>
+            <WakeUpOrSleep className='' updateVal={databaseStores.sleepRoutine} getType='faling_sleep'/>
           </div>
           
           <NoteSelector className='mt-[15px]'/>
@@ -51,16 +44,15 @@ export const Main: FC  = () =>
 
 const SleepAndWakeUp: FC = () => 
 {
-  const [ falingSleep, setFalingSleep ] = useState('');
-  const [ wakeUp, setWakeUp ] = useState('');
+  const [ faling_sleep, setFalingSleep ] = useState('');
+  const [ wake_up, setWakeUp ] = useState('');
 
   const date_str = hooks.selector.useDate();
   const date = new Date(date_str);
 
   const save = async () => 
   {
-    await crud.updateSleepTime(date, falingSleep);
-    await crud.updateWakeUp(date, wakeUp); 
+    databaseStores.sleepRoutine.put(date, { faling_sleep, wake_up });
   };
   
   const Styles = {

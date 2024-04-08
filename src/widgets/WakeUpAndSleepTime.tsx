@@ -1,12 +1,12 @@
 import { FC, useEffect, useRef, useState } from 'react';
 import { FaSun } from 'react-icons/fa';
-import { crud } from '../entities/Database';
+import { databaseStores } from '../entities/Database';
 import { hooks } from '../entities/Date.slice';
 import { useClickInside } from '../shared/useClickInside';
 
 export const WakeUpOrSleep: FC<{
     className: string,
-    updateVal: typeof crud.updateWakeUp | typeof crud.updateSleepTime,
+    updateVal: typeof databaseStores.sleepRoutine,
     getType: 'wake_up' | 'faling_sleep'
 
 }> = ({ className, updateVal, getType }) => 
@@ -28,8 +28,8 @@ export const WakeUpOrSleep: FC<{
 
   useEffect(() => 
   {
-    crud.getSleepWakeupTime(new Date(date)).then(res => 
-    { 
+    databaseStores.sleepRoutine.get(new Date(date)).then(res => 
+    {
       setVal(res && res[getType]? res[getType] : '');
     });
   }, [ date ]);
@@ -43,10 +43,13 @@ export const WakeUpOrSleep: FC<{
   {
     if(!isInsideClick && isEdit && inputRef.current)
     {
-      updateVal(new Date(date), inputRef.current.value).then(() => 
+      const val = inputRef.current.value;
+      const input: Partial<Record<typeof getType, string>> = {};
+      input[getType] = val;
+
+      updateVal.put(new Date(date), input).then(() => 
       {
-        // @ts-ignore
-        setVal(inputRef.current.value);
+        setVal(val);
         setIsEdit(false);
       });
     }

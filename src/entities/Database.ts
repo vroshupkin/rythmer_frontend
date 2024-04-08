@@ -1,134 +1,41 @@
 
 
-export class Database 
+type TOneTable<
+  StoreName extends string,
+  Data extends Record<string, any>,
+  Index extends keyof Data
+ > = {
+  store_name: StoreName,
+  data: Data,
+  index_key: Index
+}
+
+
+type TCommonNote  = TOneTable<'commonNote', {date: string, message: string}, 'date'>
+type TSleepRoutine = TOneTable<'sleepRoutine', {date: Date, wake_up: string, faling_sleep: string}, 'date'>
+
+
+export class OneTableCrud
+<
+  StoreName extends string,
+  TableData extends Record<string, any>,
+  IndexKey extends keyof TableData
+>
 {
-  private store_name = 'sleepRoutine';
+  constructor(public storeName: StoreName, public index_key: IndexKey, public db: IDBDatabase)
+  { }
   
-  constructor(private db: IDBDatabase) 
-  {}
 
-  private get objectStore()
-  {
-    return this.db.transaction([ this.store_name ], 'readwrite').objectStore(this.store_name);
-  }
-
-  updateSleepTime = (date: Date, faling_sleep: string) =>
-  {
-    return new Promise((resolve, reject) => 
-    {
-      
-      this.getSleepWakeupTime(date).then((result) => 
-      {
-        
-        if(result)
-        {
-          result.faling_sleep = faling_sleep;
-        }
-        else
-        {
-          result = { faling_sleep, date, wake_up: '' };
-        }
-
-        const request = this.objectStore.put(result);
-        request.onsuccess = resolve;
-        request.onerror = reject;
-
-      });
-
-
-    });
-  };
-
-  updateWakeUp = (date: Date, wake_up: string) =>
-  {
-    return new Promise((resolve, reject) => 
-    {
-      const get_result = async () => 
-      {
-        const result = await this.getSleepWakeupTime(date);
-        if(result)
-        {
-          result.wake_up = wake_up; 
-          
-          return result;
-        }
-        
-        return { date, wake_up, faling_sleep: '' }; 
-      };
-      
-      get_result().then(result => 
-      {
-        const request = this.objectStore.put(result);
-        request.onsuccess = resolve;
-        request.onerror = reject;
-      });
-
-
-    });
-  };
-
-  getSleepWakeupTime(date: Date): Promise<any>
-  {
-    return new Promise((resolve, reject) => 
-    {
-      const transaction = this.db.transaction([ this.store_name ], 'readonly');
-      const objectStore = transaction.objectStore(this.store_name);
-    
-      const request = objectStore.index('date').get(date);
-    
-      request.onsuccess = () => 
-      { 
-        resolve(request.result);
-      };
-
-      request.onerror = reject;
-
-    }
-    );
-  }
-}
-
-abstract class AbstractCreateStore
-{
-  abstract createStore: () => void
-}
-
-type TCommonNote = {
-  date: string,
-  message: string
-}
-export class CreateCommonNoteStore 
-{
-  constructor(private db: IDBDatabase)
-  {
-    if(!this.db.objectStoreNames.contains('commonNote'))
-    {
-      const store = this.db.createObjectStore('commonNote', { keyPath: 'id', autoIncrement: true });
-      store.createIndex('date', 'date', { unique: true });
-      store.createIndex('message', 'message');
-    }
-  }
-}
-
-export class CommonNoteCrud
-{
-  private storeName = 'commonNote';
-
-  constructor(private db: IDBDatabase)
-  {
-    
-  }
-
-  private get store()
+  get store()
   {
     return this.db.transaction([ this.storeName ], 'readwrite').objectStore(this.storeName);
   }
 
-  get(input: {date: string})
+  get(index_val: TableData[IndexKey])
   {
-    return new Promise<TCommonNote>((resolve, reject) => 
+    return new Promise<TableData | undefined>((resolve, reject) => 
     {
-      const req = this.store.index('date').get(input.date);
+      const req = this.store.index(this.index_key as string).get(index_val);
       
       req.onsuccess = () => resolve(req.result);
       req.onerror = reject;
@@ -136,40 +43,39 @@ export class CommonNoteCrud
     );
   }
 
-  put(input: {date: string, message: string})
+  put(index_val: TableData[IndexKey], input: Partial<Omit<TableData, IndexKey>>)
   {
     return new Promise((resolve, reject) =>
     {
-      const { date, message } = input;
-      
-      const result = this.get({ date }).then(res => 
+      this.get(index_val).then(res => 
       {
         if(res)
         {
-          res.message = message;
+          Object.assign(res, input);
         }
         else
         {
-          res = input;
+          res = Object.assign(input, { [this.index_key]: index_val }) as TableData;
         }
 
         this.store.put(res);
 
-        resolve(result);
+        resolve(true);
 
       }).catch(reject);
       
     });
-  }
-}
-
-export class SleepRoutineCrud
-{
-  constructor(private db: IDBDatabase)
-  {
 
   }
 }
+
+export class CommonNoteCrud extends OneTableCrud<TCommonNote['store_name'], TCommonNote['data'], TCommonNote['index_key']>
+{}
+export class SleepRoutine extends OneTableCrud<TSleepRoutine['store_name'], TSleepRoutine['data'], TSleepRoutine['index_key']> 
+{}
+
+// export const commonNoteCrud = new OneTableCrud<TCommonNoteData, TCommonNoteIndexKey>('commonNote', db, 'date')
+
 
 export class CreateStoreSleep
 {
@@ -185,18 +91,27 @@ export class CreateStoreSleep
   }
 }
 
+export class CreateCommonNoteStore 
+{
+  constructor(private db: IDBDatabase)
+  {
+    if(!this.db.objectStoreNames.contains('commonNote'))
+    {
+      const store = this.db.createObjectStore('commonNote', { keyPath: 'id', autoIncrement: true });
+      store.createIndex('date', 'date', { unique: true });
+      store.createIndex('message', 'message');
+    }
+  }
+}
+
 
 export const open_db = (db_name: string, db_version: number) => 
 {
   return new Promise<IDBDatabase>((resolve, reject) => 
   {
     const request = window.indexedDB.open(db_name, db_version);
-
-    request.onerror = (event) => 
-    {
-      reject('Database error: ' + (event.target as IDBOpenDBRequest));
-    };
-
+    
+    request.onerror = reject;
     request.onsuccess = (event) => 
     {
       const db = (event.target as IDBOpenDBRequest).result;
@@ -225,9 +140,9 @@ export const open_db = (db_name: string, db_version: number) =>
 
 
 const db = await open_db('App', 3);
-export const crud = new Database(db);
+// export const crud = new Database(db);
 export const databaseStores = {
-  commonNote: new CommonNoteCrud(db),
-  sleepRoutine: new SleepRoutineCrud(db)
+  commonNote: new CommonNoteCrud('commonNote', 'date', db),
+  sleepRoutine: new SleepRoutine('sleepRoutine', 'date', db)
 };
 
