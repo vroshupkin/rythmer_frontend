@@ -34,7 +34,10 @@ export class MonthName
     [ 'декабрь',  'декабря' ],
     
   ];
-  
+  /*
+    nominative - Именительный падеж
+    genetive - Родительный падеж
+  */
   static nominative = (ind: number) => this.months[ind][0];
   static genetive   = (ind: number) => this.months[ind][1];
 
@@ -150,3 +153,65 @@ export class setDate
     return this;
   }
 }
+
+export class DateWithSecondPrecision extends Date
+{
+  constructor(date: Date | string)
+  {
+    date = new Date(date);
+
+    date.setMilliseconds(0);
+    super(date);
+  }
+
+  override toString()
+  {
+    const set_first_null = (num: number) => num < 10? `0${num}` : `${num}`;
+
+    const seconds = set_first_null(this.getSeconds());
+    const minutes = set_first_null(this.getMinutes());
+    const hours = set_first_null(this.getHours());
+
+    const date = set_first_null(this.getDate());
+    const month = set_first_null(this.getMonth());
+    const year = (this.getFullYear() + '').slice(2);
+    
+    return `${date}.${month}.${year} ${hours}:${minutes}:${seconds}`;    
+  }
+}
+
+/**
+ * DD.MM.YY:HH:SS:MS
+ * 
+ * 19.04.2419:14:35 -> 
+ */
+export class DateWithDayPrecision extends Date
+{
+
+  constructor( date: Date | string)
+  {
+    date = new Date(date);
+    
+    date.setMilliseconds(0);
+    date.setSeconds(0);
+    date.setHours(0);    
+    super(date);
+
+  }
+
+  /**
+   * @example toString() => '04.
+   */
+  override toString()
+  {
+    const with_null = (num: number) => num < 10? `0${num}` : `${num}`;
+
+    const date = with_null(this.getDate());
+    const month = with_null(this.getMonth());
+    const year = (this.getFullYear() + '').slice(2);
+    
+    return `${date}.${month}.${year}`;    
+  }
+}
+
+

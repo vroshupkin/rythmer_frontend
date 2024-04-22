@@ -1,6 +1,6 @@
 import { FC, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { changeSelectedMonth, hooks } from '../entities/Date.slice';
+import { changeDate,  hooks } from '../entities/Date.slice';
 import { TDateStoreUseDispatch } from '../entities/Date.store';
 import { MonthName, setDate } from '../shared/DateTools';
 import { Month } from './Month';
@@ -21,7 +21,7 @@ export const Calendar: FC = () =>
     new_date.setFullYear(selectedMonth.getFullYear());  
     
     
-    dispatch(changeSelectedMonth(new_date + ''));
+    dispatch(changeDate(new_date + ''));
   };
 
 

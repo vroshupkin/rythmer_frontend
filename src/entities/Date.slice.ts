@@ -7,11 +7,7 @@ export enum DATE_SLICE {NAME = 'dateSlice'}
 
 
 const actions_handlers = {
-  changeSelectedMonth: (state: TDateSliceState, action: PayloadAction<string>) => 
-  {
-    state.selectedMonth = new Date(action.payload) + ''; 
-  },
-
+  
   changeDate: (state: TDateSliceState, action: PayloadAction<string>) => 
   {
     state.date = new Date(action.payload) + '';
@@ -41,4 +37,4 @@ export const hooks = {
   }
 };
 
-export const { changeDate, changeSelectedMonth } = dateSlice.actions;
+export const { changeDate } = dateSlice.actions;

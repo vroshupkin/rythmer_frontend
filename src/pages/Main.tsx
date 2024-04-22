@@ -1,43 +1,49 @@
 import { FC, useState } from 'react';
 import { Provider } from 'react-redux';
-import { databaseStores } from '../entities/Database';
 import { hooks } from '../entities/Date.slice';
 import { date_store } from '../entities/Date.store';
+import { DateWithSecondPrecision } from '../shared/DateTools';
 import { Calendar } from '../widgets/Calendar';
+import { CommonNotesWithStore } from '../widgets/notes/CommonNote';
 import { LeftMenu } from '../widgets/LeftMenu';
-import { NoteSelector } from '../widgets/NoteSelector';
+import { NoteSelector } from '../widgets/notes/NoteSelector';
 import { WakeUpOrSleep } from '../widgets/WakeUpAndSleepTime';
+import { databaseCommonNoteCrud, databaseSleepRoutine } from '../features/Database.tables';
 
 
 export const Main: FC  = () => 
 {
-  databaseStores.commonNote.put('09.04.24', { message: 'This is work' })
-    .then(() => 
-    {
-      databaseStores.commonNote.get('09.04.24').then(console.log);  
-    });
-  
-   
-  return(
-    <div className='flex items-start'>
-      <LeftMenu/>
+  // const put_and_get = (date: Date, message: string) => 
+  // {
+  //   const date_str = new DateWithSecondPrecision(date) + '';
 
-      <Provider store={date_store}>
+  //   databaseCommonNoteCrud.put(date_str, { message })
+  //     .then(() => 
+  //     {
+  //       databaseCommonNoteCrud.get(date_str).then(console.log);  
+  //     });
+  // };
+  
+
+  return(
+    <Provider store={date_store}>
+      <div className='flex items-start'>
+        <LeftMenu/>
         <div className='flex flex-col justify-center items-center w-[100%]'>
           <Calendar/>
           <div className='w-[320px] mt-[18px] flex flex-space justify-between'>
-            <WakeUpOrSleep className='' updateVal={databaseStores.sleepRoutine} getType='wake_up'/>
-            <WakeUpOrSleep className='' updateVal={databaseStores.sleepRoutine} getType='faling_sleep'/>
+            <WakeUpOrSleep className='' updateVal={databaseSleepRoutine} getType='wake_up'/>
+            <WakeUpOrSleep className='' updateVal={databaseSleepRoutine} getType='faling_sleep'/>
           </div>
           
           <NoteSelector className='mt-[15px]'/>
+          <CommonNotesWithStore/>
           {/* <SleepAndWakeUp/> */}
         </div>
-        
 
-      </Provider>
       
-    </div>
+      </div>
+    </Provider>
   );
 };
 
@@ -52,7 +58,7 @@ const SleepAndWakeUp: FC = () =>
 
   const save = async () => 
   {
-    databaseStores.sleepRoutine.put(date, { faling_sleep, wake_up });
+    databaseSleepRoutine.put(date, { faling_sleep, wake_up });
   };
   
   const Styles = {

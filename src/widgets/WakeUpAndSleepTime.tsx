@@ -1,12 +1,13 @@
 import { FC, useEffect, useRef, useState } from 'react';
 import { FaSun } from 'react-icons/fa';
-import { databaseStores } from '../entities/Database';
+
 import { hooks } from '../entities/Date.slice';
-import { useClickInside } from '../shared/useClickInside';
+import { useClickInside } from '../shared/useClickInside.hook';
+import { databaseSleepRoutine } from '../features/Database.tables';
 
 export const WakeUpOrSleep: FC<{
     className: string,
-    updateVal: typeof databaseStores.sleepRoutine,
+    updateVal: typeof databaseSleepRoutine,
     getType: 'wake_up' | 'faling_sleep'
 
 }> = ({ className, updateVal, getType }) => 
@@ -28,7 +29,7 @@ export const WakeUpOrSleep: FC<{
 
   useEffect(() => 
   {
-    databaseStores.sleepRoutine.get(new Date(date)).then(res => 
+    databaseSleepRoutine.get(new Date(date)).then(res => 
     {
       setVal(res && res[getType]? res[getType] : '');
     });
@@ -91,7 +92,6 @@ export const WakeUpOrSleep: FC<{
       onClick={() => !isEdit ? setIsEdit(true) : ''}
       ref={containerRef}
     >
-      {/* <FaSun className={Styles.icon} color='#FCFF5B'/> */}
       <Icon/>
       <div className={Styles.text_container} >
         

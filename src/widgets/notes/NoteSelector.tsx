@@ -1,8 +1,9 @@
 import { FC, useState } from 'react';
 import { IconType } from 'react-icons';
-import { FaFileAlt, FaSkating, FaCarrot, FaShower, FaHammer, FaCarSide } from 'react-icons/fa';
+import { FaCarSide, FaCarrot, FaFileAlt, FaHammer, FaShower, FaSkating } from 'react-icons/fa';
+import { CreateNoteButton } from './CreateNoteButton.ui';
 
-type TSelectType = 'common' | 'sport' | 'food' | 'higiene' | 'household chores' | 'travel';
+export type TSelectType = 'common' | 'sport' | 'food' | 'higiene' | 'household chores' | 'travel';
 
 export const NoteSelector: FC<{className: string}> = ({ className }) => 
 {
@@ -30,7 +31,7 @@ export const NoteSelector: FC<{className: string}> = ({ className }) =>
         <Icon Icon={FaCarSide} color='#777CFF' type='travel' selectType={selectType} onClick={click}/>
       </div>
 
-      <SelectButton className='flex justify-center w-[422px] mt-[21px]' type={selectType as TSelectType}/>
+      <CreateNoteButton className='flex justify-center w-[422px] mt-[21px]' type={selectType as TSelectType}/>
     </div>
   );
 };
@@ -68,31 +69,3 @@ const Icon: FC<{
   );
 };
 
-const SelectButton: FC<{className: string, type: TSelectType}> = ({ type, className }) => 
-{
-  const Styles = {
-    container: 'font-Inter text-[16px] text-center w-[325px] h-[50px] bg-main ' + 
-    'hover:bg-main_hover cursor-pointer flex justify-center items-center'
-  };
-
-
-  const selector: Record<TSelectType, string> = {
-    common: 'Добавить обычную заметку',
-    'household chores': 'Добавить заметку о домашних делах',
-    food: 'Добавить заметку о питании',
-    higiene: 'Добавить заметку о гигиене',
-    sport: 'Добавить заметку о физической активности',
-    travel: 'Добавить заметку о поездке'
-  };
-  
-    
-  return(
-    <div className={`${className}`}>
-      <div className={`${Styles.container}`}>
-        <span>{selector[type] ?? 'Добавить заметку'}</span>
-      </div>
-      
-    </div>
-
-  );
-};
