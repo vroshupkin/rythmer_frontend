@@ -1,3 +1,4 @@
+import { signalCacheCommonNoteUpdate } from '../entities/Cache.signal';
 import { SleepRoutine } from '../entities/Database';
 import { CommonNoteCrud, CreateCommonNoteStore } from '../features/CommonNote.table';
 import { CreateStoreSleep } from './SleepRoutine.table';
@@ -38,7 +39,7 @@ const open_db = (db_name: string, db_version: number) =>
 
 const db = await open_db('App', 3);
 
-export const databaseCommonNoteCrud = new CommonNoteCrud('commonNote', 'create_at', db);
+export const databaseCommonNoteCrud = new CommonNoteCrud('commonNote', 'create_at', db, signalCacheCommonNoteUpdate);
 export const databaseSleepRoutine = new SleepRoutine('sleepRoutine', 'date', db);
 
 

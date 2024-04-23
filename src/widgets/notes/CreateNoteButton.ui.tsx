@@ -31,7 +31,7 @@ export const CreateNoteButton: FC<{className: string, type: TSelectType}> = ({ t
     {
     case 'common':
     {
-      databaseCommonNoteCrud.put(new Date + '', { message: '', day_of_month });
+      databaseCommonNoteCrud.putWithStore(new Date + '', { message: '', day_of_month });
     }
     }
   };

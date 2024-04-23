@@ -1,11 +1,13 @@
 import { FC, useEffect, useRef, useState } from 'react';
 
 import { FaFileAlt } from 'react-icons/fa';
+import { signalCacheCommonNoteUpdate } from '../../entities/Cache.signal';
 import { hooks } from '../../entities/Date.slice';
+import { TStoreCommonNote } from '../../features/CommonNote.table';
 import { databaseCommonNoteCrud } from '../../features/Database.tables';
 import { DateWithDayPrecision, DateWithSecondPrecision } from '../../shared/DateTools';
+import { useCacheSignal } from '../../shared/useCacheSignal';
 import { useClickInside } from '../../shared/useClickInside.hook';
-import { TStoreCommonNote } from '../../features/CommonNote.table';
 
 
 type TPropsCommonNote = Pick<TStoreCommonNote, 'create_at' | 'message' | 'day_of_month'>
@@ -35,7 +37,7 @@ const CommonNote: FC<TPropsCommonNote> = ({ create_at, message, day_of_month }) 
   {
     if(isOutsideClick && isEdit)
     {
-      databaseCommonNoteCrud.put(create_at, { message: text }).then(() => 
+      databaseCommonNoteCrud.putWithStore(create_at, { message: text }).then(() => 
       {
         databaseCommonNoteCrud.get(create_at).then(res => 
         {
@@ -81,19 +83,18 @@ const CommonNote: FC<TPropsCommonNote> = ({ create_at, message, day_of_month }) 
   );
 };
 
+
 const CommonNotes: FC<{find_date: string}> = ({ find_date }) => 
 {
-  const [ notes, setNotes ] = useState([] as TStoreCommonNote[]);
-    
-
+  const [ notes, setNotes ] = useState([] as TStoreCommonNote[]); 
+  const signalData = useCacheSignal<TStoreCommonNote[]>(signalCacheCommonNoteUpdate);
+  
   useEffect(() => 
-  {
-    setNotes([]);
-    databaseCommonNoteCrud.getByDate(find_date).then((res) => 
-    {   
-      setNotes(res);    
-    });
-  }, [ find_date ]);
+  {    
+    // @ts-ignore
+    setNotes(signalData.filter(obj => obj.day_of_month === find_date));
+    
+  }, [ signalData, find_date ]);
 
   
   return(
@@ -115,7 +116,7 @@ const CommonNotes: FC<{find_date: string}> = ({ find_date }) =>
 export const CommonNotesWithStore = () => 
 {
   const date = new DateWithDayPrecision(hooks.selector.useDate());
-  
+
   return(
     <CommonNotes find_date={date + ''}/>
 
