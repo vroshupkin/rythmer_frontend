@@ -69,8 +69,6 @@ export class OneTableCrud
           res = Object.assign(input, { [this.index_key]: index_val }) as TData;
         }
 
-        this.store.put(res);
-
         const req = this.store.put(res);
         req.onsuccess = resolve;
         req.onerror = reject;
