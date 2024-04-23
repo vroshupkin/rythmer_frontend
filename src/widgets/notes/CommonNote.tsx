@@ -8,6 +8,9 @@ import { databaseCommonNoteCrud } from '../../features/Database.tables';
 import { DateWithDayPrecision, DateWithSecondPrecision } from '../../shared/DateTools';
 import { useCacheSignal } from '../../shared/useCacheSignal';
 import { useClickInside } from '../../shared/useClickInside.hook';
+import { signalSelectDate } from '../calendar/Month.signals';
+import { useSignalEffect, useSignals } from '@preact/signals-react/runtime';
+import { effect } from '@preact/signals-react';
 
 
 type TPropsCommonNote = Pick<TStoreCommonNote, 'create_at' | 'message' | 'day_of_month'>
@@ -89,13 +92,33 @@ const CommonNotes: FC<{find_date: string}> = ({ find_date }) =>
   const [ notes, setNotes ] = useState([] as TStoreCommonNote[]); 
   const signalData = useCacheSignal<TStoreCommonNote[]>(signalCacheCommonNoteUpdate);
   
-  useEffect(() => 
-  {    
+
+  const handler = () => 
+  {
     // @ts-ignore
     setNotes(signalData.filter(obj => obj.day_of_month === find_date));
     
+  };
+  
+  useEffect(() => 
+  {    
+    handler();
+    
   }, [ signalData, find_date ]);
 
+  const [ selectDate, setSelectDate ] = useState(new Date(0)); 
+
+  useSignalEffect(() => 
+  {
+    if(selectDate != signalSelectDate.value)
+    {
+      handler();
+      setSelectDate(signalSelectDate.value);
+    }
+  });
+
+
+  useSignals();
   
   return(
     <>

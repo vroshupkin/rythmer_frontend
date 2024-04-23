@@ -1,9 +1,9 @@
-import { FC } from 'react';
-import { CountDaysOfMonth, MonthName, setDate } from '../shared/DateTools';
-import { changeDate, hooks } from '../entities/Date.slice';
+import React, { FC } from 'react';
 import { useDispatch } from 'react-redux';
-import { TDateStoreUseDispatch } from '../entities/Date.store';
-import React from 'react';
+import { changeDate, hooks } from '../../entities/Date.slice';
+import { TDateStoreUseDispatch } from '../../entities/Date.store';
+import { CountDaysOfMonth, MonthName, setDate } from '../../shared/DateTools';
+import { signalSelectDate } from './Month.signals';
 
 
 type TMonthProps = {className?: string, FirstDayOfMonth: Date}
@@ -90,21 +90,22 @@ const Days: FC<{FirstDayOfMonth: Date}> = ({ FirstDayOfMonth }) =>
 
 const DayCellWithStore: FC<{day: number, FirstDayOfMonth: Date}> = ({ day, FirstDayOfMonth }) => 
 {
-  const date_str = hooks.selector.useDate();
-  const date = new Date(date_str);
+  // const date = new Date(hooks.selector.useDate());
+
 
   const isSelectedDay = () => 
-    date.getMonth() === FirstDayOfMonth.getMonth() && 
-    date.getFullYear() === FirstDayOfMonth.getFullYear() && 
-    date.getDate() === day;
+    signalSelectDate.value.getMonth() === FirstDayOfMonth.getMonth() && 
+    signalSelectDate.value.getFullYear() === FirstDayOfMonth.getFullYear() && 
+    signalSelectDate.value.getDate() === day;
   
-  const dispatch = useDispatch<TDateStoreUseDispatch>();
+  // const dispatch = useDispatch<TDateStoreUseDispatch>();
 
   const onClick = () => 
   {
     const date = new setDate(FirstDayOfMonth).setDay(day).setMidnight().date;
+    signalSelectDate.value = date;
     
-    dispatch(changeDate(date + ''));
+    // dispatch(changeDate(date + ''));
   };
 
   const Styles = {

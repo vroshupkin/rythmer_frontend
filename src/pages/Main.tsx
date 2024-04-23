@@ -3,12 +3,13 @@ import { Provider } from 'react-redux';
 import { hooks } from '../entities/Date.slice';
 import { date_store } from '../entities/Date.store';
 import { DateWithSecondPrecision } from '../shared/DateTools';
-import { Calendar } from '../widgets/Calendar';
+
 import { CommonNotesWithStore } from '../widgets/notes/CommonNote';
 import { LeftMenu } from '../widgets/LeftMenu';
 import { NoteSelector } from '../widgets/notes/NoteSelector';
 import { WakeUpOrSleep } from '../widgets/WakeUpAndSleepTime';
 import { databaseCommonNoteCrud, databaseSleepRoutine } from '../features/Database.tables';
+import { Calendar } from '../widgets/calendar/Calendar';
 
 
 export const Main: FC  = () => 
