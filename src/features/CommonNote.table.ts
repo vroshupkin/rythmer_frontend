@@ -1,4 +1,4 @@
-import { Signal, signal } from '@preact/signals-react';
+import { Signal } from '@preact/signals-react';
 import { CreateStore, OneTableCrud } from '../entities/Database';
 
 

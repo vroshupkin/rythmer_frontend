@@ -27,7 +27,7 @@ export const CreateNoteButton: FC<TPropsCreateNoteButton> = ({ type, className, 
   
   const day_of_month = new DateWithDayPrecision(selectDate) + '' ;
 
-  const click: React.MouseEventHandler<HTMLDivElement> = (e) => 
+  const click: React.MouseEventHandler<HTMLDivElement> = () => 
   {
     
     switch(type)

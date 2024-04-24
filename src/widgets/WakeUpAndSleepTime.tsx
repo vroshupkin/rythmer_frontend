@@ -1,16 +1,18 @@
 import { FC, useEffect, useRef, useState } from 'react';
 import { FaSun } from 'react-icons/fa';
 
-import { hooks } from '../entities/Date.slice';
-import { useClickInside } from '../shared/useClickInside.hook';
+import { useSignals } from '@preact/signals-react/runtime';
 import { databaseSleepRoutine } from '../features/Database.tables';
+import { useClickInside } from '../shared/useClickInside.hook';
 
-export const WakeUpOrSleep: FC<{
-    className: string,
-    updateVal: typeof databaseSleepRoutine,
-    getType: 'wake_up' | 'faling_sleep'
+type TPropsWakeUpOrSleep = {
+  className?: string,
+  updateVal: typeof databaseSleepRoutine,
+  getType: 'wake_up' | 'faling_sleep',
+  findDate: Date
+}
 
-}> = ({ className, updateVal, getType }) => 
+export const WakeUpOrSleep: FC<TPropsWakeUpOrSleep> = ({ className, updateVal, getType, findDate }) => 
 {
   const Styles = {
     main: 'w-[150px] h-[50px] cursor-pointer flex',
@@ -22,18 +24,17 @@ export const WakeUpOrSleep: FC<{
     input: 'w-[100px] h-[50px] text-center bg-edit text-[24px]'
   };
 
-  const date = hooks.selector.useDate();
 
   const [ val, setVal ] = useState('');
   const [ isEdit, setIsEdit ] = useState(false);
 
   useEffect(() => 
   {
-    databaseSleepRoutine.get(new Date(date)).then(res => 
+    databaseSleepRoutine.get(new Date(findDate)).then(res => 
     {
       setVal(res && res[getType]? res[getType] : '');
     });
-  }, [ date ]);
+  }, [ findDate ]);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -48,7 +49,7 @@ export const WakeUpOrSleep: FC<{
       const input: Partial<Record<typeof getType, string>> = {};
       input[getType] = val;
 
-      updateVal.put(new Date(date), input).then(() => 
+      updateVal.put(new Date(findDate), input).then(() => 
       {
         setVal(val);
         setIsEdit(false);
@@ -68,6 +69,7 @@ export const WakeUpOrSleep: FC<{
     }
   }, [ isEdit ]);
   
+  useSignals();
   const Icon: FC = () =>
   {
     return(

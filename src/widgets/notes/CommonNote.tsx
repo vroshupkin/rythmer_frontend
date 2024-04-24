@@ -10,7 +10,7 @@ import { useClickInside } from '../../shared/useClickInside.hook';
 type TPropsCommonNote = Pick<TStoreCommonNote, 'create_at' | 'message' | 'day_of_month'>
 
 
-export const CommonNote: FC<TPropsCommonNote> = ({ create_at, message, day_of_month }) => 
+export const CommonNote: FC<TPropsCommonNote> = ({ create_at, message }) => 
 {
   const ref = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
