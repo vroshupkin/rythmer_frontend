@@ -1,20 +1,26 @@
 import React, { FC } from 'react';
-import { useDispatch } from 'react-redux';
-import { changeDate, hooks } from '../../entities/Date.slice';
-import { TDateStoreUseDispatch } from '../../entities/Date.store';
+import { signalSelectDate } from '../../pages/Main.signals';
 import { CountDaysOfMonth, MonthName, setDate } from '../../shared/DateTools';
-import { signalSelectDate } from './Month.signals';
 
 
-type TMonthProps = {className?: string, FirstDayOfMonth: Date}
-export const Month: FC<TMonthProps> = ({ className, FirstDayOfMonth }) => 
+type TMonthProps = {
+  className?: string,
+   FirstDayOfMonth: Date,
+   clickGetDayAndMonth?: (day: number, month: number) => void
+  }
+
+export const Month: FC<TMonthProps> = ({ className, FirstDayOfMonth, clickGetDayAndMonth }) => 
 {
-  
+  const click = (day: number) => 
+  {
+    clickGetDayAndMonth? clickGetDayAndMonth(day, FirstDayOfMonth.getMonth()) : '';
+  };
+
   return(
     <section className={`select-none flex flex-col justify-center w-[100%] ${className}`}>
       <MonthTittle monthOrder={FirstDayOfMonth.getMonth()}/>
       <WeekTittle/>
-      <Days FirstDayOfMonth={FirstDayOfMonth}/>
+      <Days FirstDayOfMonth={FirstDayOfMonth} clickGetDay={click}/>
     </section>
     
   );
@@ -47,9 +53,13 @@ const WeekTittle: FC = () =>
   );
 };
 
-const Days: FC<{FirstDayOfMonth: Date}> = ({ FirstDayOfMonth }) => 
-{ 
+type TPropsDays = {
+  FirstDayOfMonth: Date, 
+  clickGetDay?: (day: number) => void
+}
 
+const Days: FC<TPropsDays> = ({ FirstDayOfMonth,  clickGetDay }) => 
+{ 
   const offset = FirstDayOfMonth.getDay() === 0? 6 : FirstDayOfMonth.getDay() - 1;
   const count = CountDaysOfMonth.getDays(FirstDayOfMonth.getMonth(), FirstDayOfMonth.getFullYear());
   
@@ -70,6 +80,7 @@ const Days: FC<{FirstDayOfMonth: Date}> = ({ FirstDayOfMonth }) =>
       {days.map((day, key) => 
         <React.Fragment key={key}>
           <DayCellWithStore 
+            onClick={clickGetDay}
             day={day}
             key={key}
             FirstDayOfMonth={FirstDayOfMonth}
@@ -88,9 +99,9 @@ const Days: FC<{FirstDayOfMonth: Date}> = ({ FirstDayOfMonth }) =>
 };
 
 
-const DayCellWithStore: FC<{day: number, FirstDayOfMonth: Date}> = ({ day, FirstDayOfMonth }) => 
+const DayCellWithStore: FC<{day: number, FirstDayOfMonth: Date, onClick?: (num: number) => void}> = (
+  { day, FirstDayOfMonth, onClick }) => 
 {
-  // const date = new Date(hooks.selector.useDate());
 
 
   const isSelectedDay = () => 
@@ -98,14 +109,14 @@ const DayCellWithStore: FC<{day: number, FirstDayOfMonth: Date}> = ({ day, First
     signalSelectDate.value.getFullYear() === FirstDayOfMonth.getFullYear() && 
     signalSelectDate.value.getDate() === day;
   
-  // const dispatch = useDispatch<TDateStoreUseDispatch>();
 
-  const onClick = () => 
+  const click = () => 
   {
     const date = new setDate(FirstDayOfMonth).setDay(day).setMidnight().date;
     signalSelectDate.value = date;
     
-    // dispatch(changeDate(date + ''));
+    onClick ? onClick(day) : '';
+    
   };
 
   const Styles = {
@@ -118,7 +129,7 @@ const DayCellWithStore: FC<{day: number, FirstDayOfMonth: Date}> = ({ day, First
 
   return(
     <div 
-      onClick={onClick}
+      onClick={click}
       className={`${Styles.common} ${Styles.unactive}`}
     > 
       <div className={`${isSelectedDay()? Styles.active : ''}`}>

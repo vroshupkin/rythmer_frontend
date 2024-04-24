@@ -1,10 +1,10 @@
+import { computed } from '@preact/signals-react';
 import { useSignals } from '@preact/signals-react/runtime';
 import { FC } from 'react';
+import { signalSelectDate } from '../../pages/Main.signals';
 import { MonthName, setDate } from '../../shared/DateTools';
 import { Month } from './Month';
-import { signalSelectDate } from './Month.signals';
 import { MonthSelector } from './MonthSelector';
-import { computed } from '@preact/signals-react';
 
 
 export const Calendar: FC = () => 
@@ -18,6 +18,15 @@ export const Calendar: FC = () =>
   ];
 
 
+  const getDayAndMonth = (day: number, month: number) => 
+  {
+    signalSelectDate.value = new setDate(signalSelectDate.value)
+      .setDay(day)
+      .setMonth(month)
+      .setMidnight()
+      .date;
+  };
+  
   return(  
     <div className='flex flex-col w-[100%]'>
       {/* <YearInput className='mt-[28px]' date={new Date()}/> */}
@@ -27,12 +36,15 @@ export const Calendar: FC = () =>
       <div className='flex justify-center'>
         <div className='flex w-[1090px] mt-[21px]'>
           <Month
+            clickGetDayAndMonth={getDayAndMonth}
             FirstDayOfMonth={signalPrevMoth.value}
           />
           <Month 
+            clickGetDayAndMonth={getDayAndMonth}
             FirstDayOfMonth={signalCenterMonth.value}
           />
           <Month 
+            clickGetDayAndMonth={getDayAndMonth}
             FirstDayOfMonth={signalNextMonth.value}
           />
         </div>

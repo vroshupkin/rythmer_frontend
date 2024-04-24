@@ -1,6 +1,9 @@
 import { Signal, effect } from '@preact/signals-react';
 import { useEffect, useRef, useState } from 'react';
 
+/**
+ * Сохраняет в оперативную память данные и уже достает из них, а не запрашивая постоянно
+ */
 export const useCacheSignal = <T>(signal: Signal<{data: T, lastUpdate: Date}>) => 
 {
   const lastUpdate = useRef(new Date(0));

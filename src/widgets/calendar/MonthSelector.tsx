@@ -1,5 +1,5 @@
 import { FC, useEffect, useState } from 'react';
-import { signalSelectDate } from './Month.signals';
+import { signalSelectDate } from '../../pages/Main.signals';
 
 
 export const MonthSelector: FC<{

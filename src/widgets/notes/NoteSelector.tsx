@@ -1,11 +1,14 @@
-import { FC, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { IconType } from 'react-icons';
 import { FaCarSide, FaCarrot, FaFileAlt, FaHammer, FaShower, FaSkating } from 'react-icons/fa';
-import { CreateNoteButton } from './CreateNoteButton.ui';
 
 export type TSelectType = 'common' | 'sport' | 'food' | 'higiene' | 'household chores' | 'travel';
 
-export const NoteSelector: FC<{className: string}> = ({ className }) => 
+type TPropsNoteSelector = {
+  className: string,
+  onChangeNoteType: (type: TSelectType) => void
+}
+export const NoteSelector: FC<TPropsNoteSelector> = ({ className, onChangeNoteType }) => 
 {
   const Styles = {
     container: 'w-[422px] h-[55px] flex justify-between',
@@ -13,10 +16,17 @@ export const NoteSelector: FC<{className: string}> = ({ className }) =>
     file: 'bg-[#5BCEFF] '
   };
   
-  const [ selectType, setSelectType ] = useState('');
+  const [ selectType, setSelectType ] = useState<TSelectType>('common');
+
+  useEffect(() => 
+  {
+    onChangeNoteType(selectType);
+  }, [ selectType ]);
+  
 
   const click = (str: string) => 
   {
+    // @ts-ignore
     setSelectType(str);
   };
 
@@ -30,8 +40,6 @@ export const NoteSelector: FC<{className: string}> = ({ className }) =>
         <Icon Icon={FaHammer} color='#FF8170' type='household chores' selectType={selectType} onClick={click}/>
         <Icon Icon={FaCarSide} color='#777CFF' type='travel' selectType={selectType} onClick={click}/>
       </div>
-
-      <CreateNoteButton className='flex justify-center w-[422px] mt-[21px]' type={selectType as TSelectType}/>
     </div>
   );
 };

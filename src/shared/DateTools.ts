@@ -80,16 +80,23 @@ function isLeapYear(year: number)
 export class setDate
 {
   #date: Date;
-  constructor(date: Date)
+  constructor(date?: Date)
   {
-    this.#date = new Date(date);
+    this.#date = date ? new Date(date) : new Date();
   }
 
   get date()
   {
     return this.#date;
   }
-  
+
+  setMonth(num: number)
+  {
+    this.#date.setMonth(num);
+    
+    return this;
+  }
+
   setDay(num: number)
   {
     this.#date.setDate(num);
@@ -102,6 +109,7 @@ export class setDate
     
     return this;
   }
+  
   
   nextMonth()
   {
@@ -181,9 +189,7 @@ export class DateWithSecondPrecision extends Date
 }
 
 /**
- * DD.MM.YY:HH:SS:MS
- * 
- * 19.04.2419:14:35 -> 
+ * 19.04.2024:14:35 -> 19.04.2024:00:00
  */
 export class DateWithDayPrecision extends Date
 {
@@ -194,6 +200,7 @@ export class DateWithDayPrecision extends Date
     
     date.setMilliseconds(0);
     date.setSeconds(0);
+    date.setMinutes(0);
     date.setHours(0);    
     super(date);
 
@@ -202,16 +209,20 @@ export class DateWithDayPrecision extends Date
   /**
    * @example toString() => '04.
    */
-  override toString()
+  override toString(): string
   {
-    const with_null = (num: number) => num < 10? `0${num}` : `${num}`;
-
-    const date = with_null(this.getDate());
-    const month = with_null(this.getMonth());
-    const year = (this.getFullYear() + '').slice(2);
-    
-    return `${date}.${month}.${year}`;    
+    return dd_mm_yy(this);
   }
 }
 
+const dd_mm_yy = (date: Date, separator='.') =>
+{
+  const with_null = (num: number) => num < 10? `0${num}` : `${num}`;
 
+  const day = with_null(date.getDate());
+  const month = with_null(date.getMonth());
+  const year = (date.getFullYear() + '').slice(2);
+    
+
+  return [ day, month, year ].join(separator);
+};

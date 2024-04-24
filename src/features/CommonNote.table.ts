@@ -51,7 +51,7 @@ export class CommonNoteCrud
 
   
   // TODO Сделать обощенный сигнал на обновления 
-  putWithStore = async (key: TIndexVal, input: Partial<Omit<TStoreCommonNote, TKeyIndex>>) =>
+  putWithSignal = async (key: TIndexVal, input: Partial<Omit<TStoreCommonNote, TKeyIndex>>) =>
   {
     await this.put(key, input);
     const data = await this.getAll();

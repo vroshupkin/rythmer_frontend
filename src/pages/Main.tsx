@@ -1,31 +1,28 @@
-import { FC, useState } from 'react';
+import { FC, useEffect, useRef, useState } from 'react';
 import { Provider } from 'react-redux';
 import { hooks } from '../entities/Date.slice';
 import { date_store } from '../entities/Date.store';
-import { DateWithSecondPrecision } from '../shared/DateTools';
 
-import { CommonNotesWithStore } from '../widgets/notes/CommonNote';
+
+import { useSignals } from '@preact/signals-react/runtime';
+import { databaseSleepRoutine } from '../features/Database.tables';
 import { LeftMenu } from '../widgets/LeftMenu';
-import { NoteSelector } from '../widgets/notes/NoteSelector';
 import { WakeUpOrSleep } from '../widgets/WakeUpAndSleepTime';
-import { databaseCommonNoteCrud, databaseSleepRoutine } from '../features/Database.tables';
 import { Calendar } from '../widgets/calendar/Calendar';
+import { signalSelectDate } from './Main.signals';
+import { NoteSelector, TSelectType } from '../widgets/notes/NoteSelector';
+import { Notes } from '../widgets/notes/Notes';
+import { CreateNoteButton } from '../widgets/notes/CreateNoteButton.ui';
 
 
 export const Main: FC  = () => 
 {
-  // const put_and_get = (date: Date, message: string) => 
-  // {
-  //   const date_str = new DateWithSecondPrecision(date) + '';
-
-  //   databaseCommonNoteCrud.put(date_str, { message })
-  //     .then(() => 
-  //     {
-  //       databaseCommonNoteCrud.get(date_str).then(console.log);  
-  //     });
-  // };
+  useSignals();
   
-
+  const [ noteType, setNoteType ] = useState<TSelectType>('common');
+  const onChangeNoteType = (type: TSelectType) => setNoteType(type);
+  
+  
   return(
     <Provider store={date_store}>
       <div className='flex items-start'>
@@ -37,8 +34,15 @@ export const Main: FC  = () =>
             <WakeUpOrSleep className='' updateVal={databaseSleepRoutine} getType='faling_sleep'/>
           </div>
           
-          <NoteSelector className='mt-[15px]'/>
-          <CommonNotesWithStore/>
+          <NoteSelector className='mt-[15px]'
+            onChangeNoteType={onChangeNoteType}
+          />
+          
+          <CreateNoteButton className='flex justify-center w-[422px] mt-[21px]'
+            type={noteType}
+            selectDate={signalSelectDate.value}/>
+          <Notes find_date={signalSelectDate.value}/>
+          
           {/* <SleepAndWakeUp/> */}
         </div>
 

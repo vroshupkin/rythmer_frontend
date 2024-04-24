@@ -1,11 +1,14 @@
 import { FC } from 'react';
-import { hooks } from '../../entities/Date.slice';
-import { TSelectType } from './NoteSelector';
 import { databaseCommonNoteCrud } from '../../features/Database.tables';
 import { DateWithDayPrecision } from '../../shared/DateTools';
+import { TSelectType } from './NoteSelector';
 
-
-export const CreateNoteButton: FC<{className: string, type: TSelectType}> = ({ type, className }) => 
+type TPropsCreateNoteButton = {
+  className: string,
+  type: TSelectType,
+  selectDate: Date
+}
+export const CreateNoteButton: FC<TPropsCreateNoteButton> = ({ type, className, selectDate }) => 
 {
   const Styles = {
     container: 'font-Inter text-[16px] text-center w-[325px] h-[50px] bg-main select-none ' + 
@@ -22,7 +25,7 @@ export const CreateNoteButton: FC<{className: string, type: TSelectType}> = ({ t
     travel: 'Добавить заметку о поездке'
   };
   
-  const day_of_month = new DateWithDayPrecision(hooks.selector.useDate()) + '' ;
+  const day_of_month = new DateWithDayPrecision(selectDate) + '' ;
 
   const click: React.MouseEventHandler<HTMLDivElement> = (e) => 
   {
@@ -31,7 +34,7 @@ export const CreateNoteButton: FC<{className: string, type: TSelectType}> = ({ t
     {
     case 'common':
     {
-      databaseCommonNoteCrud.putWithStore(new Date + '', { message: '', day_of_month });
+      databaseCommonNoteCrud.putWithSignal(new Date + '', { message: '', day_of_month });
     }
     }
   };
