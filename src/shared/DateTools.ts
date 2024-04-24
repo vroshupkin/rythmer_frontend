@@ -181,7 +181,7 @@ export class DateWithSecondPrecision extends Date
     const hours = set_first_null(this.getHours());
 
     const date = set_first_null(this.getDate());
-    const month = set_first_null(this.getMonth());
+    const month = set_first_null(this.getMonth() + 1);
     const year = (this.getFullYear() + '').slice(2);
     
     return `${date}.${month}.${year} ${hours}:${minutes}:${seconds}`;    
@@ -220,7 +220,7 @@ const dd_mm_yy = (date: Date, separator='.') =>
   const with_null = (num: number) => num < 10? `0${num}` : `${num}`;
 
   const day = with_null(date.getDate());
-  const month = with_null(date.getMonth());
+  const month = with_null(date.getMonth() + 1);
   const year = (date.getFullYear() + '').slice(2);
     
 
