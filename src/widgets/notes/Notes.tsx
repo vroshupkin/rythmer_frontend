@@ -21,7 +21,7 @@ export const Notes: FC<TPropsNotes> = ({ find_date }) =>
   const handler = () => 
   {
     const date_str = new DateWithDayPrecision(find_date) + '';
-    
+
     // @ts-ignore
     setNotes(signalData.filter(obj => obj.day_of_month === date_str));
     
@@ -29,7 +29,6 @@ export const Notes: FC<TPropsNotes> = ({ find_date }) =>
   
   useEffect(() => 
   {    
-    
     handler();
     
   }, [ signalData, find_date ]);
@@ -38,10 +37,10 @@ export const Notes: FC<TPropsNotes> = ({ find_date }) =>
 
   useSignalEffect(() => 
   {
-    if(selectDate != signalSelectDate.value)
+    if(selectDate + '' != signalSelectDate.value + '')
     {
       handler();
-      setSelectDate( new Date(signalSelectDate.value));
+      setSelectDate(new Date(signalSelectDate.value));
     }
   });
 

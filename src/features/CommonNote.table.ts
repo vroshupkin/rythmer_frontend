@@ -19,24 +19,28 @@ export class CommonNoteCrud
 {
   
   // Кешированные данные
-  private _data = { data: [] as TStoreCommonNote[], lastUpdate: new Date() };
+  // private _data = { data: [] as TStoreCommonNote[], lastUpdate: new Date() };
 
   constructor(storeName: TStoreName, index_key: TKeyIndex, db: IDBDatabase, 
     private cacheSignal: Signal<{lastUpdate: Date, data: any[]}>)
   { 
     super(storeName, index_key, db);
 
+    // Инициализация кеша 
     this.getAll().then(data => 
     {
+      
       data = data ?? [];
-      this._data = { data, lastUpdate: new Date() };
+      this.cacheSignal.value = { data, lastUpdate: new Date() };
+
+      // this._data = { data, lastUpdate: new Date() };
     });
   }
 
-  public get data()
-  {
-    return Object.assign(this._data, {});
-  }
+  // public get data()
+  // {
+  //   return { ...this._data };
+  // }
 
   async getByDate(find_date: string)
   {
