@@ -1,7 +1,8 @@
-import { FC } from 'react';
+import { FC, useEffect, useRef } from 'react';
 import { databaseCommonNoteCrud } from '../../features/Database.tables';
 import { DateWithDayPrecision } from '../../shared/DateTools';
 import { TSelectType } from './NoteSelector';
+import { useHoverPath } from '../../shared/useMouseHover';
 
 type TPropsCreateNoteButton = {
   className: string,
@@ -39,12 +40,25 @@ export const CreateNoteButton: FC<TPropsCreateNoteButton> = ({ type, className, 
     }
   };
   
+  const [ HoverComponent, setIsHover ] = useHoverPath('CreateNoteButton', new Error());
+  
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => 
+  {
+    ref.current?.addEventListener('mouseenter', () => setIsHover(true));
+    ref.current?.addEventListener('mouseleave', () => setIsHover(false));
+    ref.current?.classList.add('relative');
+    
+    console.log(ref.current?.onmouseenter);
+    
+  }, [ ref ]);
+  
   return(
-    <div className={`${className}`}>
+    <div className={`${className}`} ref={ref}>
       <div className={`${Styles.container}`} onClick={click}>
         <span>{selector[type] ?? 'Добавить заметку'}</span>
       </div>
-      
+      <HoverComponent/>
     </div>
 
   );
