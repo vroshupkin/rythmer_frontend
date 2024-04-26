@@ -1,6 +1,7 @@
-import React, { FC } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 import { signalSelectDate } from '../../pages/Main.signals';
 import { CountDaysOfMonth, MonthName, setDate } from '../../shared/DateTools';
+import { databaseSleepRoutine } from '../../features/Database.tables';
 
 
 type TMonthProps = {
@@ -99,10 +100,65 @@ const Days: FC<TPropsDays> = ({ FirstDayOfMonth,  clickGetDay }) =>
 };
 
 
+const useNotifyHaveFalingSleep = (FirstDayOfMonth: Date, day: number) => 
+{
+  const [ isHaveFalingSleep, setIsHaveFalingSleep ] = useState(false);
+  const [ isHaveWakeupTime, setIsHaveWakeupTime ] = useState(false);
+  
+  useEffect(() => 
+  {
+    const date = new setDate(FirstDayOfMonth).setDay(day).setMidnight().date;
+
+    databaseSleepRoutine.get(date).then(res => 
+    {
+
+      if(res)
+      {
+        setIsHaveFalingSleep(!!res.faling_sleep?.length);
+        setIsHaveWakeupTime(!!res.wake_up?.length);
+      }
+      else
+      {
+        setIsHaveFalingSleep(false);
+        setIsHaveWakeupTime(false);
+      }
+    });
+    
+  });
+
+  const FalingSleepIcon = () => 
+  {
+    return(
+      <>
+        {isHaveFalingSleep ? 
+          <div className='absolute w-[8px] h-[4px] bg-[#3663f7] top-0 right-0'></div> : 
+          <></>
+        }
+      </>
+
+    );
+  };
+  const WakeUpIcon = () => 
+  {
+    return(
+      <>
+        {isHaveWakeupTime? 
+          <div className='absolute w-[8px] h-[4px] bg-[#ffae16] top-[0px] right-[8px]'></div>: 
+          <></>
+        }
+      </>
+      
+    );
+  };
+
+  return [ FalingSleepIcon, WakeUpIcon ] as const;
+};
+
 const DayCellWithStore: FC<{day: number, FirstDayOfMonth: Date, onClick?: (num: number) => void}> = (
   { day, FirstDayOfMonth, onClick }) => 
 {
 
+  const [ FalingSleepIcon, WakeUpIcon ] = useNotifyHaveFalingSleep(FirstDayOfMonth, day);
 
   const isSelectedDay = () => 
     signalSelectDate.value.getMonth() === FirstDayOfMonth.getMonth() && 
@@ -120,7 +176,7 @@ const DayCellWithStore: FC<{day: number, FirstDayOfMonth: Date, onClick?: (num: 
   };
 
   const Styles = {
-    common: 'cursor-pointer w-[50px] h-[50px] flex justify-center items-center ',
+    common: 'relative cursor-pointer w-[50px] h-[50px] flex justify-center items-center ',
     active: 'bg-select hover:bg-select_hover w-[100%] h-[100%] flex justify-center items-center rounded-[50px]' + 
     ' border-[1px]',
     unactive: 'bg-main hover:bg-main_hover',
@@ -135,6 +191,10 @@ const DayCellWithStore: FC<{day: number, FirstDayOfMonth: Date, onClick?: (num: 
       <div className={`${isSelectedDay()? Styles.active : ''}`}>
         <span>{day}</span>
       </div>
+
+      {<FalingSleepIcon/>}
+      {<WakeUpIcon/>}
+      
     </div>
   );
 };
