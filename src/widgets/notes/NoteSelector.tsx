@@ -1,6 +1,7 @@
-import { FC, useEffect, useState } from 'react';
+import { FC, useEffect, useRef, useState } from 'react';
 import { IconType } from 'react-icons';
 import { FaCarSide, FaCarrot, FaFileAlt, FaHammer, FaShower, FaSkating } from 'react-icons/fa';
+import { useHoverPath } from '../../shared/useMouseHover';
 
 export type TSelectType = 'common' | 'sport' | 'food' | 'higiene' | 'household chores' | 'travel';
 
@@ -33,24 +34,25 @@ export const NoteSelector: FC<TPropsNoteSelector> = ({ className, onChangeNoteTy
   return(
     <div className={`${className}`}>
       <div className={`${Styles.container}`}>
-        <Icon Icon={FaFileAlt} color='#5BCEFF' type='common' selectType={selectType} onClick={click}/>
-        <Icon Icon={FaSkating} color='#21BEE0' type='sport' selectType={selectType} onClick={click}/>
-        <Icon Icon={FaCarrot} color='#F37934' type='food' selectType={selectType} onClick={click}/>
-        <Icon Icon={FaShower} color='#3971FF' type='higiene' selectType={selectType} onClick={click}/>
-        <Icon Icon={FaHammer} color='#FF8170' type='household chores' selectType={selectType} onClick={click}/>
-        <Icon Icon={FaCarSide} color='#777CFF' type='travel' selectType={selectType} onClick={click}/>
+        <SelectIcon Icon={FaFileAlt} color='#5BCEFF' type='common' selectType={selectType} onClick={click}/>
+        <SelectIcon Icon={FaSkating} color='#21BEE0' type='sport' selectType={selectType} onClick={click}/>
+        <SelectIcon Icon={FaCarrot} color='#F37934' type='food' selectType={selectType} onClick={click}/>
+        <SelectIcon Icon={FaShower} color='#3971FF' type='higiene' selectType={selectType} onClick={click}/>
+        <SelectIcon Icon={FaHammer} color='#FF8170' type='household chores' selectType={selectType} onClick={click}/>
+        <SelectIcon Icon={FaCarSide} color='#777CFF' type='travel' selectType={selectType} onClick={click}/>
       </div>
     </div>
   );
 };
 
-const Icon: FC<{
+type TPropsIcon = {
     Icon: IconType,
     color: string,
     onClick: (str: string) => void,
     type: TSelectType,
     selectType: string
-}> = ({ Icon, color, onClick, type, selectType }) => 
+}
+const SelectIcon: FC<TPropsIcon> = ({ Icon, color, onClick, type, selectType }) => 
 {
     
   const Styles = {
@@ -66,14 +68,19 @@ const Icon: FC<{
     onClick(type);
   };
 
+  const [ HoverComponent, setIsHover ] = useHoverPath('SelectIcon', new Error());
+
   return(
-    <>
+    <div className='relative'>
       <Icon 
         className={`${Styles.icon} ${type === selectType? Styles.select.true : Styles.select.false}`} 
         onClick={Click}
         color={color}
+        
+        onMouseEnter={() => setIsHover(true)}
+        onMouseLeave={() => setIsHover(false)}
       />
-    </>
+      <HoverComponent/>
+    </div>
   );
 };
-
