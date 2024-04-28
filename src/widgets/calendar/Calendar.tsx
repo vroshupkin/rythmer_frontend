@@ -59,16 +59,16 @@ export const Calendar: FC = () =>
 };
 
 
-const YearInput: FC<{date: Date, className?: string}> = ({ date, className }) => 
-{
-  return(
-    <section className={`flex justify-center w-[100%] select-none cursor-pointer ${className}`}>
-      <div className='flex items-center justify-center w-[350px] h-[50px] bg-main hover:bg-main_hover'>
-        <span>{date.getFullYear()}</span>
-      </div>
-    </section>   
-  );
-};
+// const YearInput: FC<{date: Date, className?: string}> = ({ date, className }) => 
+// {
+//   return(
+//     <section className={`flex justify-center w-[100%] select-none cursor-pointer ${className}`}>
+//       <div className='flex items-center justify-center w-[350px] h-[50px] bg-main hover:bg-main_hover'>
+//         <span>{date.getFullYear()}</span>
+//       </div>
+//     </section>   
+//   );
+// };
 
 
 const DateView: FC<{
