@@ -15,6 +15,8 @@ import { signalSelectDate } from './Main.signals';
 
 export const Main: FC  = () => 
 {
+
+  console.log('CI/CD work');
   
   const [ noteType, setNoteType ] = useState<TSelectType>('common');
   const onChangeNoteType = (type: TSelectType) => setNoteType(type);
