@@ -13,9 +13,12 @@ deploy:
     - echo "$SSH_PRIVATE_KEY" | base64 -d > ~/.ssh/id_rsa
     - ssh-keyscan -H $SSH_HOST > ~/.ssh/known_hosts
   script:
-    - ssh $SSH_USER@$SSH_HOST \
-      "cd $WORK_DIR && git pull && npm run build \
-      rm -rf /home/www/html/* && mkdir -p /home/www/html && mv ./dist/* /home/www/html && exit"
+    - ssh $SSH_USER@$SSH_HOST
+      "cd $WORK_DIR &&
+      git pull && npm run build &&
+      rm -rf /home/www/html/* && mkdir -p /home/www/html &&
+      mv ./dist/* /home/www/html
+      && exit"
     # - ssh $SSH_USER@$SSH_HOST "cd $WORK_DIR && rm -rf /home/www/html/* && mkdir -p /home/www/html && mv ./dist/* /home/www/html && exit"
 
   after_script:
