@@ -17,21 +17,25 @@
 # https://gitlab.com/gitlab-org/gitlab/-/blob/master/lib/gitlab/ci/templates/Getting-Started.gitlab-ci.yml
 
 stages:          # List of stages for jobs, and their order of execution
+  - prepare
   - build
   - test
   - deploy
 
+before_script:
+  stage: prepare
+  script: 
+    - eval `ssh-agent -s`
+    - ssh-add
+    - ssh-add <(echo "$SSH_Private")
+    - mkdir -p ~/.ssh
+    - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
+
 build-job:       # This job runs in the build stage, which runs first.
   stage: build
   script:
-    - eval `ssh-agent -s`
-    - ssh-add
-    - echo "Compiling the code..."
-    - echo "Compile complete."
-    - whoami
-    - touch hellO_runner.txt
-    - echo "$SSH_Private" | tr -d '\r' | ssh-add - > /dev/null
     - ssh vrosh@77.222.53.47
+    - touch ~/hello_runner.txt
 
 unit-test-job:   # This job runs in the test stage.
   stage: test    # It only starts when the job in the build stage completes successfully.
