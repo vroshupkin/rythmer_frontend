@@ -33,7 +33,7 @@ before-script:
 build-job: # This job runs in the build stage, which runs first.
   stage: build
   script:
-    - ssh vrosh@77.222.53.47
+    - ssh -T vrosh@77.222.53.47
     - touch ~/hello_runner.txt
 
 unit-test-job: # This job runs in the test stage.
