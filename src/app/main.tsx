@@ -11,6 +11,7 @@ import { TanStackRouterDevtools } from '@tanstack/router-devtools';
 import { StrictMode } from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
+import { BooksPage } from './Books.page';
 
 const rootRoute = createRootRoute({
   component: () => (
@@ -22,15 +23,21 @@ const rootRoute = createRootRoute({
   ),
 });
 
-const indexRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: '/',
-  component: Main
-},
-);
+const routers = 
+[
+  {
+    getParentRoute: () => rootRoute,
+    path: '/',
+    component: Main
+  },
+  {
+    getParentRoute: () => rootRoute,
+    path: '/books',
+    component: BooksPage
+  }
+].map(createRoute);
 
-
-const routeTree = rootRoute.addChildren([ indexRoute ]);
+const routeTree = rootRoute.addChildren(routers);
 const router = createRouter({ routeTree });
 
 declare module '@tanstack/react-router' {
